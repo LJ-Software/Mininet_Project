@@ -295,9 +295,23 @@ void sr_handlepacket(struct sr_instance* sr,
 
   /*************************************************************************/
   /* TODO: Handle packets                                                  */
-
-
-
+    
+  // Cast received ethernet packet into ethernet header format given by sr_protocol.h
+  sr_ethernet_hdr_t *ehdr = (sr_ethernet_hdr_t *) packet;
+  
+    
+  // Determine if packet is ARP or IP
+    
+    // If ARP: pass to sr_handlepacket_arp function
+    sr_handlepacket_arp(sr*, packet*, len, interface*);
+    
+    // If IP:
+    sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t));
+        // Check IP packet length
+        // Validate IP header
+            // Is version IPv4?
+            // Validate checksum (sr_utils.c)
+    
   /*************************************************************************/
 
 }/* end sr_ForwardPacket */
