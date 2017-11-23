@@ -296,23 +296,73 @@ void sr_handlepacket(struct sr_instance* sr,
   /*************************************************************************/
   /* TODO: Handle packets                                                  */
     
-  // Cast received ethernet packet into ethernet header format given by sr_protocol.h
+  /* Cast received ethernet packet into ethernet header format given by sr_protocol.h */
+  int minlength = sizeof(sr_ethernet_hdr_t);
+  if (len < minlength) {
+    fprintf(stderr, "Failed to parse ETHERNET header, insufficient length\n");
+    return;
+  }
+
   sr_ethernet_hdr_t *ehdr = (sr_ethernet_hdr_t *) packet;
-  
     
-  // Determine if packet is ARP or IP
+  /* Determine if packet is ARP or IP */
+    switch(ehdr->ethertype){
+      /* If ARP: pass to sr_handlepacket_arp function */
+      case 2054:
+      sr_handlepacket_arp(sr,packet,len,sr_get_interface(sr,interface));
+      break;
     
-    // If ARP: pass to sr_handlepacket_arp function
-    sr_handlepacket_arp(sr*, packet*, len, interface*);
+      /* If IP: */
+      case 2048:
+      sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t));
+        /* Check if IP packet length meets minimum */
+      if (len < (minlength + sizeof(sr_ip_hdr_t))) {
+      fprintf(stderr, "Failed to parse IP header, insufficient length\n");
+      return;
+      }
+        /* Validate IP header */
+            /* Validate checksum (sr_utils.c) */
+            uint16_t _checksum = cksum(iphdr,iphdr->ip_len);
+            if (_checksum != iphdr->ip_sum){
+              fprintf(stderr, "IP header checksums do not match! Discarding packet.\n");
+              break;
+            }
+        /* Check if this packet is destined to this router or not */
+    bool isDestinedForRouter = false;
+
+    struct sr_if* if_walker = 0;
+
+    if_walker = sr->if_list;
     
-    // If IP:
-    sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t));
-        // Check IP packet length
-        // Validate IP header
-            // Is version IPv4?
-            // Validate checksum (sr_utils.c)
-    
+    while(if_walker->next)
+    {
+        if_walker = if_walker->next;
+        if (iphdr->ip_dst == if_walker.ip){
+          isDestinedForRouter = true;
+        }
+    }
+
+    if(isDestinedForRouter){
+      /* if the IP protocol is ICMP: respond */
+      if(iphdr->ip_p == 1){
+        sr_icmp_hdr *icmphdr = (sr_icmp_hdr *)(packet + sizeof(sr_ethernet_hdr_t) + iphdr->len);
+        switch(icmphdr->icmp_type){
+          case 8:
+          /* decrement the ttl */
+          iphdr->ip_ttl -= 1;
+          sr_send_packet()
+          break;
+        }
+      }
+    } else {
+
+    } 
+
+      break;
+
+      /* If neither */
+      fprintf(stderr, "Failed to parse packet, unsupported ethertype\n");      
+    }
   /*************************************************************************/
 
 }/* end sr_ForwardPacket */
-
