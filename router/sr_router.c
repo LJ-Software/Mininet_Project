@@ -247,6 +247,7 @@ void sr_handlepacket_arp(struct sr_instance *sr, uint8_t *pkt,
     /* Process pending ARP request entry, if there is one */
     if (req != NULL)
     {
+	
 	//Initialize reqst_len and reqst_pkt to send packet to the linked list
 	unsigned int reqst_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_arp_hdr_t);
     uint8_t *reqst_pkt = (uint8_t *)malloc(reqst_len);
