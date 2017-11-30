@@ -303,9 +303,26 @@ void sr_handlepacket_arp(struct sr_instance *sr, uint8_t *pkt,
     /* Process pending ARP request entry, if there is one */
     if (req != NULL)
     {
+
       /*********************************************************************/
       /* TODO: send all packets on the req->packets linked list            */
- 
+ 	//Initialize reqst_len and reqst_pkt to send packet to the linked list
+	unsigned int reqst_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_arp_hdr_t);
+    uint8_t *reqst_pkt = (uint8_t *)malloc(reqst_len);
+
+	//Sends packets to the linked list
+	sr_send_packet(sr,reqst_pkt,reqst_len,req->packets);
+		for(int i = 0; i < sizeof(req); i++){
+			if(reqst_pkt != NULL){
+				//Send ARP reply
+				sr_send_arpreply(sr,pkt,len,src_iface);
+				//Update ARP cache with contents of ARP Reply
+				struct sr_arpreq *req = sr_arpcache_insert(&(sr->cache), arphdr->ar_sha, 
+				arphdr->ar_sip);
+				//Send to handle arp req method 
+				sr_handle_arpreq(sr,req,src_iface);
+			}
+		}
 
 
       /*********************************************************************/
