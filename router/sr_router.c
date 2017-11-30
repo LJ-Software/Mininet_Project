@@ -170,7 +170,63 @@ void sr_handle_arpreq(struct sr_instance *sr, struct sr_arpreq *req,
       /*********************************************************************/
       /* TODO: send ICMP host uncreachable to the source address of all    */
       /* packets waiting on this request                                   */
-
+struct sr_packet *pack = req->packets;
+      unsigned int icmp_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr) + sizeof(sr_icmp_t3_hdr_t);
+      uint8_t *icmp_pkt = (uint8_t *)malloc(icmp_len);
+      if (NULL == icmp_pkt)
+      {
+        fprintf(stderr,"Failed to allocate space for ICMP message");
+        return;
+      }
+      sr_ethernet_hdr_t *icmp_ethhdr = (sr_ethernet_hdr_t *)icmp_pkt;
+      sr_ip_hdr_t *icmp_ip = (sr_ip_hdr_t *)(icmp_pkt + sizeof(sr_ethernet_hdr_t));
+      sr_icmp_t3_hdr_t *icmp_t3_hdr = (sr_icmp_t3_hdr_t *)(icmp_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+      /* For each packet in req->packets */
+      do
+      {
+        uint8_t *buf = pack->buf;
+        uint16_t ethtype = ethertype(buf);
+        if (ethtype == ethertype_ip)
+        {
+          sr_ethernet_hdr_t *ehdr = (sr_ethernet_hdr_t *)buf;
+          /* Populate Ethernet header */
+          memcpy(icmp_ethhdr->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
+          memcpy(icmp_ethhdr->ether_shost, out_iface->addr, ETHER_ADDR_LEN);
+          icmp_ethhdr->ether_type = ehdr->ether_type;
+          
+          sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(buf + sizeof(sr_ethernet_hdr_t));
+          /* Populate IP header */
+          icmp_ip->tos = iphdr->tos;
+          icmp_ip->len = sizeof(sr_ip_hdr) + sizeof(icmp_t3_hdr);
+          icmp_ip->id = iphdr->id;
+          icmp_ip->off = 0x0000;
+          icmp_ip->ttl = 0xFF;
+          icmp_ip->p = 0x01;
+          icmp_ip->sum = 0x0000;
+          icmp_ip->ip_src = out_iface->ip;
+          icmp_ip->ip_dst = iphdr->ip_src;
+          /* Calculate IP checksum */
+          icmp_ip->sum = cksum(icmp_ip, sizeof(sr_ip_hdr));
+          
+          /* Populate ICMP header */
+          icmp_t3_hdr->icmp_type = 0x03;
+          icmp_t3_hdr->icmp_code = 0x01;
+          icmp_t3_hdr->sum = 0x0000;
+          icmp_t3_hdr->unused = 0x0000;
+          icmp_t3_hdr->next_mtu = 0x0000;
+          memcpy(icmp_t3_hdr->data, iphdr, ICMP_DATA_SIZE);
+          /* Calculate ICMP checksum */
+          icmp_t3_hdr->sum = cksum(icmp_t3_hdr, sizeof(icmp_t3_hdr));
+          
+          /* Send packet to source address */
+          sr_send_packet(sr, icmp_pkt, icmp_len, out_iface);
+        }
+        /* Prepare next packet */
+        pack = pack->next;
+        free(buf);
+      } while(pack);
+      free(icmp_pkt);
+      free(pack);
 
 
 
@@ -249,63 +305,7 @@ void sr_handlepacket_arp(struct sr_instance *sr, uint8_t *pkt,
     {
       /*********************************************************************/
       /* TODO: send all packets on the req->packets linked list            */
- struct sr_packet *pack = req->packets;
-      unsigned int icmp_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr) + sizeof(sr_icmp_t3_hdr_t);
-      uint8_t *icmp_pkt = (uint8_t *)malloc(icmp_len);
-      if (NULL == icmp_pkt)
-      {
-        fprintf(stderr,"Failed to allocate space for ICMP message");
-        return;
-      }
-      sr_ethernet_hdr_t *icmp_ethhdr = (sr_ethernet_hdr_t *)icmp_pkt;
-      sr_ip_hdr_t *icmp_ip = (sr_ip_hdr_t *)(icmp_pkt + sizeof(sr_ethernet_hdr_t));
-      sr_icmp_t3_hdr_t *icmp_t3_hdr = (sr_icmp_t3_hdr_t *)(icmp_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
-      /* For each packet in req->packets */
-      do
-      {
-        uint8_t *buf = pack->buf;
-        uint16_t ethtype = ethertype(buf);
-        if (ethtype == ethertype_ip)
-        {
-          sr_ethernet_hdr_t *ehdr = (sr_ethernet_hdr_t *)buf;
-          /* Populate Ethernet header */
-          memcpy(icmp_ethhdr->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
-          memcpy(icmp_ethhdr->ether_shost, out_iface->addr, ETHER_ADDR_LEN);
-          icmp_ethhdr->ether_type = ehdr->ether_type;
-          
-          sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(buf + sizeof(sr_ethernet_hdr_t));
-          /* Populate IP header */
-          icmp_ip->tos = iphdr->tos;
-          icmp_ip->len = sizeof(sr_ip_hdr) + sizeof(icmp_t3_hdr);
-          icmp_ip->id = iphdr->id;
-          icmp_ip->off = 0x0000;
-          icmp_ip->ttl = 0xFF;
-          icmp_ip->p = 0x01;
-          icmp_ip->sum = 0x0000;
-          icmp_ip->ip_src = out_iface->ip;
-          icmp_ip->ip_dst = iphdr->ip_src;
-          /* Calculate IP checksum */
-          icmp_ip->sum = cksum(icmp_ip, sizeof(sr_ip_hdr));
-          
-          /* Populate ICMP header */
-          icmp_t3_hdr->icmp_type = 0x03;
-          icmp_t3_hdr->icmp_code = 0x01;
-          icmp_t3_hdr->sum = 0x0000;
-          icmp_t3_hdr->unused = 0x0000;
-          icmp_t3_hdr->next_mtu = 0x0000;
-          memcpy(icmp_t3_hdr->data, iphdr, ICMP_DATA_SIZE);
-          /* Calculate ICMP checksum */
-          icmp_t3_hdr->sum = cksum(icmp_t3_hdr, sizeof(icmp_t3_hdr));
-          
-          /* Send packet to source address */
-          sr_send_packet(sr, icmp_pkt, icmp_len, out_iface);
-        }
-        /* Prepare next packet */
-        pack = pack->next;
-        free(buf);
-      } while(pack);
-      free(icmp_pkt);
-      free(pack);
+ 
 
 
       /*********************************************************************/
