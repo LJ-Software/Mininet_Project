@@ -197,7 +197,7 @@ void sr_handle_arpreq(struct sr_instance *sr, struct sr_arpreq *req,
           sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(buf + sizeof(sr_ethernet_hdr_t));
           /* Populate IP header */
           icmp_ip->ip_tos = iphdr->ip_tos;
-          icmp_ip->ip_len = sizeof(sr_ip_hdr_t) + sizeof(icmp_t3_hdr_t);
+          icmp_ip->ip_len = sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t);
           icmp_ip->ip_id = iphdr->ip_id;
           icmp_ip->ip_off = 0x0000;
           icmp_ip->ip_ttl = 0xFF;
@@ -216,7 +216,7 @@ void sr_handle_arpreq(struct sr_instance *sr, struct sr_arpreq *req,
           icmp_t3_hdr->next_mtu = 0x0000;
           memcpy(icmp_t3_hdr->data, iphdr, ICMP_DATA_SIZE);
           /* Calculate ICMP checksum */
-          icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(icmp_t3_hdr));
+          icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(sr_icmp_t3_hdr));
           
           /* Send packet to source address */
           sr_send_packet(sr, icmp_pkt, icmp_len, out_iface->name);
