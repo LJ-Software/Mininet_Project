@@ -452,6 +452,7 @@ void sr_handlepacket(struct sr_instance* sr,
               send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
+	free(send_pkt);
           break;
         }
         /* if the IP protocol is TCP (6) or UDP (17): respond with port unreachable */
@@ -485,6 +486,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
+	  free(send_pkt);
       }
     /* if the packet is NOT destined for this router */
     } else {
@@ -519,6 +521,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
+	free(send_pkt);
 	    } else {
       	/* check routing table for longest matching prefix IP address */
 	int isOnRoutingTable = 0;
@@ -566,6 +569,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
+	free(send_pkt);
 	} else{
 	/* decrement the ttl & recalculate checksum */
           iphdr->ip_ttl -= 1;
@@ -603,6 +607,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
+	free(send_pkt);
 	}else{
           /* if there is a hit use the IP and MAC info to forward to next hop */
 	memcpy(ehdr->ether_dhost, arp_entry->mac, ETHER_ADDR_LEN);
