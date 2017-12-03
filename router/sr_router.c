@@ -219,7 +219,7 @@ struct sr_packet *pack = req->packets;
           icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(icmp_t3_hdr));
           
           /* Send packet to source address */
-          sr_send_packet(sr, icmp_pkt, icmp_len, out_iface->name);
+          sr_send_packet(sr, icmp_pkt, icmp_len, out_iface);
         }
         /* Prepare next packet */
         pack = pack->next;
@@ -377,7 +377,7 @@ void sr_handlepacket(struct sr_instance* sr,
   sr_ethernet_hdr_t *ehdr = (sr_ethernet_hdr_t *) packet;
     
   /* Determine if packet is ARP or IP */
-    switch(ehdr->ethertype){
+    switch(ethertype){
       /* If ARP: pass to sr_handlepacket_arp function */
       case 2054:
       sr_handlepacket_arp(sr,packet,len,sr_get_interface(sr,interface));
@@ -399,7 +399,7 @@ void sr_handlepacket(struct sr_instance* sr,
               break;
             }
         /* Check if this packet is destined to this router or not */
-    bool isDestinedForRouter = false;
+    int isDestinedForRouter = 0;
 
     struct sr_if* if_walker = 0;
 
@@ -407,21 +407,21 @@ void sr_handlepacket(struct sr_instance* sr,
     
     while(if_walker->next){
         if_walker = if_walker->next;
-        if (iphdr->ip_dst == if_walker.ip){
-          isDestinedForRouter = true;
+        if (iphdr->ip_dst == if_walker->ip){
+          isDestinedForRouter = 1;
         }
     }
 
     /* if the packet IS destined for this router */
-    if(isDestinedForRouter){
+    if(isDestinedForRouter == 1){
       /* if the IP protocol is ICMP: respond */
       if(iphdr->ip_p == 1){
         sr_icmp_hdr_t *icmphdr = (sr_icmp_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
         switch(icmphdr->icmp_type){
           case 8:
           /* Build packet to send */
-              unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr);
-              uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
+              uint32_t send_pkt_len = (sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
+              uint8_t *send_pkt = malloc(send_pkt_len);
 
               sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
               sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
