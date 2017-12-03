@@ -441,7 +441,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
               memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
-              send_pkt_eth->ether_type = 0x0800;
+              send_pkt_eth->ether_type = htons(ethertype_ip);
 
               send_pkt_ip->ip_tos = iphdr->ip_tos;
               send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
@@ -478,7 +478,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
-          send_pkt_eth->ether_type = 0x0800;
+          send_pkt_eth->ether_type = htons(ethertype_ip);
 
           send_pkt_ip->ip_tos = iphdr->ip_tos;
           send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
@@ -516,7 +516,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
-          send_pkt_eth->ether_type = 0x0800;
+          send_pkt_eth->ether_type = htons(ethertype_ip);
 
           send_pkt_ip->ip_tos = iphdr->ip_tos;
           send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
@@ -567,7 +567,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
-          send_pkt_eth->ether_type = 0x0800;
+          send_pkt_eth->ether_type = htons(ethertype_ip);
 
           send_pkt_ip->ip_tos = iphdr->ip_tos;
           send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
@@ -612,7 +612,7 @@ void sr_handlepacket(struct sr_instance* sr,
 	
           memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
-          send_pkt_eth->ether_type = 0x0800;
+          send_pkt_eth->ether_type = htons(ethertype_ip);
 
           send_pkt_ip->ip_tos = iphdr->ip_tos;
           send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
