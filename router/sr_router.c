@@ -590,7 +590,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ip_ttl = 255;
           send_pkt_ip->ip_p = 1;
           send_pkt_ip->ip_sum = 0;
-          send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
+          send_pkt_ip->ip_src = sr->sr_addr.sin_addr;
           send_pkt_ip->ip_dst = iphdr->ip_src;
               
           send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
@@ -598,8 +598,8 @@ void sr_handlepacket(struct sr_instance* sr,
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	}else{
           /* if there is a hit use the IP and MAC info to forward to next hop */
-	ehdr->ether_dhost = (unsigned char *)(arp_entry->mac);
-	ehdr->ether_shost = (unsigned char *)(rt_entry->interface);
+	ehdr->ether_dhost = (char *)(arp_entry->mac);
+	ehdr->ether_shost = (char *)(rt_entry->interface);
 
         sr_send_packet(sr, packet, len, rt_entry->interface);
 	}
