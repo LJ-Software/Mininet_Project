@@ -216,7 +216,7 @@ void sr_handle_arpreq(struct sr_instance *sr, struct sr_arpreq *req,
           icmp_t3_hdr->next_mtu = 0x0000;
           memcpy(icmp_t3_hdr->data, iphdr, ICMP_DATA_SIZE);
           /* Calculate ICMP checksum */
-          icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(sr_icmp_t3_hdr));
+          icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(sr_icmp_t3_hdr_t));
           
           /* Send packet to source address */
           sr_send_packet(sr, icmp_pkt, icmp_len, out_iface->name);
