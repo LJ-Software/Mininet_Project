@@ -604,7 +604,7 @@ void sr_handlepacket(struct sr_instance* sr,
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	}else{
           /* if there is a hit use the IP and MAC info to forward to next hop */
-	ehdr->ether_dhost = arp_entry->mac;
+	memcpy(ehdr->ether_dhost, arp_entry->mac, ETHER_ADDR_LEN);
 	memcpy(ehdr->ether_shost, rt_entry->interface, ETHER_ADDR_LEN);
 
         sr_send_packet(sr, packet, len, rt_entry->interface);
