@@ -394,8 +394,10 @@ void sr_handlepacket(struct sr_instance* sr,
       }
         /* Validate IP header */
             /* Validate checksum (sr_utils.c) */
+		uint16_t orig_ip_sum = iphdr->ip_sum;
+		iphdr->ip_sum = 0;
             uint16_t _checksum = cksum(iphdr,sizeof(sr_ip_hdr_t));
-            if (_checksum != iphdr->ip_sum){
+            if (_checksum != orig_ip_sum){
               fprintf(stderr, "IP header checksums do not match! Discarding packet.\n");
               break;
             }
