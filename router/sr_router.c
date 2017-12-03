@@ -598,8 +598,8 @@ void sr_handlepacket(struct sr_instance* sr,
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	}else{
           /* if there is a hit use the IP and MAC info to forward to next hop */
-	(unsigned char *)(ehdr->ether_dhost) = arp_entry->mac;
-	(unsigned char *)(ehdr->ether_shost) = rt_entry->interface;
+	ehdr->ether_dhost = arp_entry->mac;
+	ehdr->ether_shost = rt_entry->interface;
 
         sr_send_packet(sr, packet, len, rt_entry->interface);
 	}
