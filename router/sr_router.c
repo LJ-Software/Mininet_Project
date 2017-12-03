@@ -313,14 +313,15 @@ void sr_handlepacket_arp(struct sr_instance *sr, uint8_t *pkt,
 		while(packet_linkedlist != NULL){
 
 			sr_ethernet_hdr_t *packet_linkedlist_ethernet = (sr_ethernet_hdr_t *)(packet_linkedlist->buf);
+			sr_arp_hdr_t *packet_linkedlist_arp = (sr_arp_hdr_t *)(packet_linkedlist->buf + sizeof(sr_ethernet_hdr_t));
 			
-			memcpy(packet_linkedlist->ether_shost, arp_header->ether_dhost, ETHER_ADDR_LEN * sizeof(uint8_t));
-			memcpy(packet_linkedlist->ether_dhost, arp_header->ether_shost, ETHER_ADDR_LEN * sizeof(uint8_t));
+			memcpy(packet_linkedlist_ethernet->ether_shost, packet_linkedlist_arp->ar_tha, ETHER_ADDR_LEN * sizeof(uint8_t));
+			memcpy(packet_linkedlist_ethernet->ether_dhost, packet_linkedlist_arp->ar_sha, ETHER_ADDR_LEN * sizeof(uint8_t));
 
-			//Sends packet to the linked list
+			/*Sends packet to the linked list*/
 			sr_send_packet(sr,packet_linkedlist->buf,packet_linkedlist->len,packet_linkedlist->iface);
 
-			//After the packet is sent it is directed to the next one 
+			/*After the packet is sent it is directed to the next one */
 			packet_linkedlist = packet_linkedlist->next;
 		}
       /*********************************************************************/
