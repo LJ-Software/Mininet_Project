@@ -637,7 +637,7 @@ void sr_handlepacket(struct sr_instance* sr,
 	}else{
           /* if there is a hit use the IP and MAC info to forward to next hop */
 	memcpy(ehdr->ether_dhost, arp_entry->mac, ETHER_ADDR_LEN);
-	memcpy(ehdr->ether_shost, rt_entry->interface, ETHER_ADDR_LEN);
+	memcpy(ehdr->ether_shost, (sr_get_interface(sr,rt_entry->interface))->addr, ETHER_ADDR_LEN);
 
 		fprintf(stderr,"Attempting to forward the following packet\n");
 		print_hdrs(packet, len);
