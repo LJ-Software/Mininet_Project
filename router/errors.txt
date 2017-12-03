@@ -1,17 +1,10 @@
 gcc -MM -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c  > .sr_router.d
 gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c -o sr_router.o
 sr_router.c: In function ‘sr_handle_arpreq’:
-sr_router.c:200:36: error: ‘sr_ip_hdr’ undeclared (first use in this function)
-           icmp_ip->ip_len = sizeof(sr_ip_hdr) + sizeof(icmp_t3_hdr);
-                                    ^
-sr_router.c:200:36: note: each undeclared identifier is reported only once for each function it appears in
-sr_router.c:222:11: warning: passing argument 4 of ‘sr_send_packet’ from incompatible pointer type [enabled by default]
-           sr_send_packet(sr, icmp_pkt, icmp_len, out_iface);
-           ^
-In file included from sr_router.c:22:0:
-sr_router.h:63:5: note: expected ‘const char *’ but argument is of type ‘struct sr_if *’
- int sr_send_packet(struct sr_instance* , uint8_t* , unsigned int , const char*);
-     ^
+sr_router.c:200:58: error: ‘icmp_t3_hdr_t’ undeclared (first use in this function)
+           icmp_ip->ip_len = sizeof(sr_ip_hdr_t) + sizeof(icmp_t3_hdr_t);
+                                                          ^
+sr_router.c:200:58: note: each undeclared identifier is reported only once for each function it appears in
 sr_router.c: In function ‘sr_handlepacket_arp’:
 sr_router.c:308:2: error: expected expression before ‘/’ token
   /struct sr_packet *packet_linkedlist = req->packets; 
@@ -32,42 +25,21 @@ sr_router.c:315:23: warning: unused variable ‘packet_linkedlist_ethernet’ [-
     sr_ethernet_hdr_t *packet_linkedlist_ethernet = (sr_ethernet_hdr_t *)(packet_linkedlist->buf);
                        ^
 sr_router.c: In function ‘sr_handlepacket’:
-sr_router.c:380:12: error: switch quantity not an integer
-     switch(ethertype){
+sr_router.c:380:12: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     switch((uint16_t)ethertype){
             ^
-sr_router.c:388:7: error: a label can only be part of a statement and a declaration is not a statement
-       sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t));
-       ^
-sr_router.c:423:15: error: a label can only be part of a statement and a declaration is not a statement
-               uint32_t send_pkt_len = (sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
-               ^
-sr_router.c:424:15: error: expected expression before ‘uint8_t’
-               uint8_t *send_pkt = malloc(send_pkt_len);
-               ^
-sr_router.c:426:70: error: ‘send_pkt’ undeclared (first use in this function)
-               sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
-                                                                      ^
-sr_router.c:430:41: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
-               send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
-                                         ^
-sr_router.c:431:41: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
-               send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
-                                         ^
-sr_router.c:441:15: error: aggregate value used where an integer was expected
-               send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
-               ^
-sr_router.c:455:96: error: ‘sr_icmp_hdr’ undeclared (first use in this function)
-           unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr);
-                                                                                                ^
+sr_router.c:430:43: error: cast specifies array type
+               send_pkt_eth->ether_dhost = (uint8_t[6])(ehdr->ether_shost);
+                                           ^
+sr_router.c:431:43: error: cast specifies array type
+               send_pkt_eth->ether_shost = (uint8_t[6])(ehdr->ether_dhost);
+                                           ^
 sr_router.c:462:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
            send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
                                      ^
 sr_router.c:463:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
            send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
                                      ^
-sr_router.c:473:11: error: aggregate value used where an integer was expected
-           send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
-           ^
 sr_router.c:495:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
            send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
                                      ^
@@ -77,9 +49,6 @@ sr_router.c:496:37: error: incompatible types when assigning to type ‘uint8_t[
 sr_router.c:503:22: error: ‘sr_ip_hdr_t’ has no member named ‘ttl’
            send_pkt_ip->ttl = 255;
                       ^
-sr_router.c:506:11: error: aggregate value used where an integer was expected
-           send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
-           ^
 sr_router.c:518:2: error: unknown type name ‘bool’
   bool isOnRoutingTable = false;
   ^
@@ -101,9 +70,6 @@ sr_router.c:542:37: error: incompatible types when assigning to type ‘uint8_t[
 sr_router.c:549:22: error: ‘sr_ip_hdr_t’ has no member named ‘ttl’
            send_pkt_ip->ttl = 255;
                       ^
-sr_router.c:552:11: error: aggregate value used where an integer was expected
-           send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
-           ^
 sr_router.c:567:71: error: request for member ‘dest’ in something not a structure or union
   struct sr_arpentry *arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
                                                                        ^
@@ -147,4 +113,7 @@ sr_router.c:601:20: error: incompatible types when assigning to type ‘uint8_t[
 sr_router.c:602:20: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘char *’
   ehdr->ether_shost = rt_entry->interface;
                     ^
+sr_router.c:610:7: error: ‘send_pkt’ undeclared (first use in this function)
+  free(send_pkt);
+       ^
 make: *** [sr_router.o] Error 1
