@@ -300,7 +300,15 @@ void sr_handlepacket_arp(struct sr_instance *sr, uint8_t *pkt,
     {
       /*********************************************************************/
       /* TODO: send all packets on the req->packets linked list            */
- struct sr_packet *packet_linkedlist = req->packets; 
+	 /*struct sr_packet *req_list = req->packets;
+	    
+	 while(req->next){
+	 
+	 req_list = req->next;
+	 }
+	  */  
+	    
+	 struct sr_packet *packet_linkedlist = req->packets; 
 
 	printf("ARP Packet: ");
 	print_hdrs(pkt,len);
@@ -314,10 +322,10 @@ void sr_handlepacket_arp(struct sr_instance *sr, uint8_t *pkt,
 			memcpy(packet_linkedlist_ethernet->ether_shost, packet_linkedlist_arp->ar_tha, ETHER_ADDR_LEN * sizeof(uint8_t));
 			memcpy(packet_linkedlist_ethernet->ether_dhost, packet_linkedlist_arp->ar_sha, ETHER_ADDR_LEN * sizeof(uint8_t));
 			*/
-			/*Sends packet to the linked list*/
-			sr_send_packet(sr,packet_linkedlist,packet_linkedlist->len,packet_linkedlist->iface);
+			/*Sends packet to the linked list */
+			sr_send_packet(sr,&(packet_linkedlist->buf),packet_linkedlist->len,packet_linkedlist->iface);
 
-			/*After the packet is sent it is directed to the next one */
+			/*After the packet is sent it is directed to the next one  */
 			packet_linkedlist = packet_linkedlist->next;
 		}
       /*********************************************************************/
