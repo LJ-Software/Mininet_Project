@@ -604,7 +604,7 @@ void sr_handlepacket(struct sr_instance* sr,
 	arp_entry = sr_arpcache_lookup(&(sr->cache),iphdr->ip_dst);
 	if(arp_entry == 0){
 		/* if there is not a match respond ICMP host unreachable */
-	    uint32_t send_pkt_len = sizeof(packet);
+	    uint32_t send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
