@@ -219,7 +219,7 @@ struct sr_packet *pack = req->packets;
           icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(icmp_t3_hdr));
           
           /* Send packet to source address */
-          sr_send_packet(sr, icmp_pkt, icmp_len, out_iface);
+          sr_send_packet(sr, icmp_pkt, icmp_len, out_iface->name);
         }
         /* Prepare next packet */
         pack = pack->next;
