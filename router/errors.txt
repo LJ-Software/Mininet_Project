@@ -25,14 +25,14 @@ sr_router.c:315:23: warning: unused variable ‘packet_linkedlist_ethernet’ [-
     sr_ethernet_hdr_t *packet_linkedlist_ethernet = (sr_ethernet_hdr_t *)(packet_linkedlist->buf);
                        ^
 sr_router.c: In function ‘sr_handlepacket’:
-sr_router.c:380:12: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
-     switch((uint16_t)ethertype){
+sr_router.c:380:12: error: switch quantity not an integer
+     switch((uint16_t *)ethertype){
             ^
 sr_router.c:430:43: error: cast specifies array type
-               send_pkt_eth->ether_dhost = (uint8_t[6])(ehdr->ether_shost);
+               send_pkt_eth->ether_dhost = (uint8_t[])(ehdr->ether_shost);
                                            ^
 sr_router.c:431:43: error: cast specifies array type
-               send_pkt_eth->ether_shost = (uint8_t[6])(ehdr->ether_dhost);
+               send_pkt_eth->ether_shost = (uint8_t[])(ehdr->ether_dhost);
                                            ^
 sr_router.c:462:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
            send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
@@ -46,58 +46,60 @@ sr_router.c:495:37: error: incompatible types when assigning to type ‘uint8_t[
 sr_router.c:496:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
            send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
                                      ^
-sr_router.c:503:22: error: ‘sr_ip_hdr_t’ has no member named ‘ttl’
-           send_pkt_ip->ttl = 255;
-                      ^
-sr_router.c:518:2: error: unknown type name ‘bool’
-  bool isOnRoutingTable = false;
-  ^
-sr_router.c:518:26: error: ‘false’ undeclared (first use in this function)
-  bool isOnRoutingTable = false;
-                          ^
-sr_router.c:527:40: error: request for member ‘dest’ in something not a structure or union
-          if (iphdr->ip_dst == rt_walker.dest){
-                                        ^
-sr_router.c:528:31: error: ‘true’ undeclared (first use in this function)
-            isOnRoutingTable = true;
-                               ^
-sr_router.c:541:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
-           send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
-                                     ^
-sr_router.c:542:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
-           send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
-                                     ^
-sr_router.c:549:22: error: ‘sr_ip_hdr_t’ has no member named ‘ttl’
-           send_pkt_ip->ttl = 255;
-                      ^
-sr_router.c:567:71: error: request for member ‘dest’ in something not a structure or union
-  struct sr_arpentry *arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
-                                                                       ^
+sr_router.c:527:28: error: invalid operands to binary == (have ‘uint32_t’ and ‘struct in_addr’)
+          if (iphdr->ip_dst == rt_walker->dest){
+                            ^
+sr_router.c:541:39: error: cast specifies array type
+           send_pkt_eth->ether_dhost = (uint8_t[])(ehdr->ether_shost);
+                                       ^
+sr_router.c:542:39: error: cast specifies array type
+           send_pkt_eth->ether_shost = (uint8_t[])(ehdr->ether_dhost);
+                                       ^
+sr_router.c:567:70: error: request for member ‘dest’ in something not a structure or union
+  struct sr_arpentry arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
+                                                                      ^
 sr_router.c:567:9: error: incompatible type for argument 1 of ‘sr_arpcache_lookup’
-  struct sr_arpentry *arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
+  struct sr_arpentry arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
          ^
 In file included from sr_router.h:17:0,
                  from sr_router.c:22:
 sr_arpcache.h:111:21: note: expected ‘struct sr_arpcache *’ but argument is of type ‘struct sr_arpcache’
  struct sr_arpentry *sr_arpcache_lookup(struct sr_arpcache *cache, uint32_t ip);
                      ^
-sr_router.c:571:49: error: request for member ‘dest’ in something not a structure or union
-             sr_waitforarp(sr,packet,len,rt_entry.dest,rt_entry.interface);
-                                                 ^
-sr_router.c:571:63: error: request for member ‘interface’ in something not a structure or union
-             sr_waitforarp(sr,packet,len,rt_entry.dest,rt_entry.interface);
-                                                               ^
-sr_router.c:573:51: error: request for member ‘dest’ in something not a structure or union
-  arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
-                                                   ^
+sr_router.c:569:15: error: invalid operands to binary == (have ‘struct sr_arpentry’ and ‘void *’)
+  if(arp_entry == NULL){
+               ^
+sr_router.c:571:13: error: incompatible type for argument 4 of ‘sr_waitforarp’
+             sr_waitforarp(sr,packet,len,rt_entry->dest,rt_entry->interface);
+             ^
+sr_router.c:257:6: note: expected ‘uint32_t’ but argument is of type ‘struct in_addr’
+ void sr_waitforarp(struct sr_instance *sr, uint8_t *pkt,
+      ^
+sr_router.c:571:13: warning: passing argument 5 of ‘sr_waitforarp’ from incompatible pointer type [enabled by default]
+             sr_waitforarp(sr,packet,len,rt_entry->dest,rt_entry->interface);
+             ^
+sr_router.c:257:6: note: expected ‘struct sr_if *’ but argument is of type ‘char *’
+ void sr_waitforarp(struct sr_instance *sr, uint8_t *pkt,
+      ^
 sr_router.c:573:2: error: incompatible type for argument 1 of ‘sr_arpcache_lookup’
-  arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
+  arp_entry = sr_arpcache_lookup(sr->cache,rt_entry->dest);
   ^
 In file included from sr_router.h:17:0,
                  from sr_router.c:22:
 sr_arpcache.h:111:21: note: expected ‘struct sr_arpcache *’ but argument is of type ‘struct sr_arpcache’
  struct sr_arpentry *sr_arpcache_lookup(struct sr_arpcache *cache, uint32_t ip);
                      ^
+sr_router.c:573:2: error: incompatible type for argument 2 of ‘sr_arpcache_lookup’
+  arp_entry = sr_arpcache_lookup(sr->cache,rt_entry->dest);
+  ^
+In file included from sr_router.h:17:0,
+                 from sr_router.c:22:
+sr_arpcache.h:111:21: note: expected ‘uint32_t’ but argument is of type ‘struct in_addr’
+ struct sr_arpentry *sr_arpcache_lookup(struct sr_arpcache *cache, uint32_t ip);
+                     ^
+sr_router.c:574:15: error: invalid operands to binary == (have ‘struct sr_arpentry’ and ‘void *’)
+  if(arp_entry == NULL){
+               ^
 sr_router.c:582:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
            send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
                                      ^
@@ -107,9 +109,9 @@ sr_router.c:583:37: error: incompatible types when assigning to type ‘uint8_t[
 sr_router.c:593:31: error: incompatible types when assigning to type ‘uint32_t’ from type ‘struct in_addr’
            send_pkt_ip->ip_src = sr->sr_addr.sin_addr;
                                ^
-sr_router.c:601:20: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘unsigned char *’
+sr_router.c:601:31: error: invalid type argument of ‘->’ (have ‘struct sr_arpentry’)
   ehdr->ether_dhost = arp_entry->mac;
-                    ^
+                               ^
 sr_router.c:602:20: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘char *’
   ehdr->ether_shost = rt_entry->interface;
                     ^
