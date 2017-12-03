@@ -1,10 +1,10 @@
 gcc -MM -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c  > .sr_router.d
 gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c -o sr_router.o
 sr_router.c: In function ‘sr_handle_arpreq’:
-sr_router.c:200:58: error: ‘icmp_t3_hdr_t’ undeclared (first use in this function)
-           icmp_ip->ip_len = sizeof(sr_ip_hdr_t) + sizeof(icmp_t3_hdr_t);
-                                                          ^
-sr_router.c:200:58: note: each undeclared identifier is reported only once for each function it appears in
+sr_router.c:219:61: error: ‘sr_icmp_t3_hdr’ undeclared (first use in this function)
+           icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(sr_icmp_t3_hdr));
+                                                             ^
+sr_router.c:219:61: note: each undeclared identifier is reported only once for each function it appears in
 sr_router.c: In function ‘sr_handlepacket_arp’:
 sr_router.c:308:2: error: expected expression before ‘/’ token
   /struct sr_packet *packet_linkedlist = req->packets; 
