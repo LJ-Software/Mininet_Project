@@ -528,7 +528,7 @@ void sr_handlepacket(struct sr_instance* sr,
     
     	while(rt_walker->next){
         	rt_walker = rt_walker->next;
-        	if (iphdr->ip_dst == rt_walker->dest->s_addr){
+        	if (iphdr->ip_dst == rt_walker->dest.s_addr){
           	isOnRoutingTable = 1;
 		rt_entry = rt_walker;
         	}
@@ -573,7 +573,7 @@ void sr_handlepacket(struct sr_instance* sr,
           /* if there is a miss send an ARP request to the IP dest*/
 	if(arp_entry == 0){
             /* TODO: Build packet to send */
-            sr_waitforarp(sr,packet,len,iphdr->ip_dst,(char *)(rt_entry->interface));
+            sr_waitforarp(sr,packet,len,iphdr->ip_dst,rt_entry->interface);
 	}
 	arp_entry = sr_arpcache_lookup(&(sr->cache),iphdr->ip_dst);
 	if(arp_entry == 0){
