@@ -497,7 +497,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_icmp->icmp_code = 3;
           send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
 	      
-	      fprintf(stderr"Attempting to send the following ICMP Port unreachable packet\n");
+	      fprintf(stderr,"Attempting to send the following ICMP Port unreachable packet\n");
 		print_hdrs(send_pkt, send_pkt_len);
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
@@ -535,7 +535,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_icmp->icmp_code = 0;
           send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
 
-		fprintf("Attempting to send the following ICMP Time Exceeded packet\n");
+		fprintf(stderr,"Attempting to send the following ICMP Time Exceeded packet\n");
 		print_hdrs(send_pkt, send_pkt_len);
 		
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
