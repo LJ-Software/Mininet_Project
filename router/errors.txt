@@ -1,3 +1,4 @@
+gcc -MM -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c  > .sr_router.d
 gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c -o sr_router.o
 sr_router.c: In function ‘sr_handle_arpreq’:
 sr_router.c:200:58: error: ‘icmp_t3_hdr_t’ undeclared (first use in this function)
@@ -24,33 +25,9 @@ sr_router.c:315:23: warning: unused variable ‘packet_linkedlist_ethernet’ [-
     sr_ethernet_hdr_t *packet_linkedlist_ethernet = (sr_ethernet_hdr_t *)(packet_linkedlist->buf);
                        ^
 sr_router.c: In function ‘sr_handlepacket’:
-sr_router.c:443:38: error: ‘sr_ip_hdr_t’ has no member named ‘ip_new_src’
-           send_pkt_ip->ip_dst = iphdr->ip_new_src;
-                                      ^
-sr_router.c:441:24: warning: unused variable ‘ip_new_src’ [-Wunused-variable]
-               uint32_t ip_new_src = iphdr->ip_src;;
-                        ^
-sr_router.c:476:38: error: ‘sr_ip_hdr_t’ has no member named ‘ip_new_src’
-           send_pkt_ip->ip_dst = iphdr->ip_new_src;
-                                      ^
-sr_router.c:474:20: warning: unused variable ‘ip_new_src’ [-Wunused-variable]
-           uint32_t ip_new_src = iphdr->ip_src;;
-                    ^
-sr_router.c:510:38: error: ‘sr_ip_hdr_t’ has no member named ‘ip_new_src’
-           send_pkt_ip->ip_dst = iphdr->ip_new_src;
-                                      ^
-sr_router.c:508:20: warning: unused variable ‘ip_new_src’ [-Wunused-variable]
-           uint32_t ip_new_src = iphdr->ip_src;;
-                    ^
 sr_router.c:530:28: error: invalid operands to binary == (have ‘uint32_t’ and ‘struct in_addr’)
           if (iphdr->ip_dst == rt_walker->dest){
                             ^
-sr_router.c:557:38: error: ‘sr_ip_hdr_t’ has no member named ‘ip_new_src’
-           send_pkt_ip->ip_dst = iphdr->ip_new_src;
-                                      ^
-sr_router.c:555:20: warning: unused variable ‘ip_new_src’ [-Wunused-variable]
-           uint32_t ip_new_src = iphdr->ip_src;;
-                    ^
 sr_router.c:571:61: error: cannot convert to a pointer type
   struct sr_arpentry *arp_entry = sr_arpcache_lookup((struct sr_arpcache *)(sr->cache),rt_entry->dest);
                                                              ^
@@ -60,9 +37,6 @@ In file included from sr_router.h:17:0,
 sr_arpcache.h:111:21: note: expected ‘uint32_t’ but argument is of type ‘struct in_addr’
  struct sr_arpentry *sr_arpcache_lookup(struct sr_arpcache *cache, uint32_t ip);
                      ^
-sr_router.c:573:26: error: expected expression before ‘)’ token
-  if(arp_entry == (void *)){
-                          ^
 sr_router.c:575:13: error: incompatible type for argument 4 of ‘sr_waitforarp’
              sr_waitforarp(sr,packet,len,rt_entry->dest,rt_entry->interface);
              ^
@@ -84,18 +58,6 @@ In file included from sr_router.h:17:0,
 sr_arpcache.h:111:21: note: expected ‘uint32_t’ but argument is of type ‘struct in_addr’
  struct sr_arpentry *sr_arpcache_lookup(struct sr_arpcache *cache, uint32_t ip);
                      ^
-sr_router.c:578:26: error: expected expression before ‘)’ token
-  if(arp_entry == (void *)){
-                          ^
-sr_router.c:581:49: error: ‘send_pkt_len’ undeclared (first use in this function)
-           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
-                                                 ^
-sr_router.c:599:38: error: ‘sr_ip_hdr_t’ has no member named ‘ip_new_src’
-           send_pkt_ip->ip_dst = iphdr->ip_new_src;
-                                      ^
-sr_router.c:597:11: warning: unused variable ‘ip_new_src’ [-Wunused-variable]
-  uint32_t ip_new_src = iphdr->ip_src;;
-           ^
 sr_router.c:606:31: error: request for member ‘mac’ in something not a structure or union
   ehdr->ether_dhost = arp_entry.mac;
                                ^
