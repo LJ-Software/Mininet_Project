@@ -572,8 +572,7 @@ void sr_handlepacket(struct sr_instance* sr,
 	struct sr_arpentry *arp_entry = sr_arpcache_lookup(&(sr->cache),rt_entry->dest.s_addr);
           /* if there is a miss send an ARP request to the IP dest*/
 	if(arp_entry == 0){
-            /* TODO: Build packet to send */
-            sr_waitforarp(sr,packet,len,iphdr->ip_dst,rt_entry->interface);
+            sr_waitforarp(sr,packet,len,iphdr->ip_dst,sr_get_interface(sr,rt_entry->interface));
 	}
 	arp_entry = sr_arpcache_lookup(&(sr->cache),iphdr->ip_dst);
 	if(arp_entry == 0){
