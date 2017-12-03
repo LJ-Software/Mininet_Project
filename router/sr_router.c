@@ -219,7 +219,7 @@ void sr_handle_arpreq(struct sr_instance *sr, struct sr_arpreq *req,
           icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(sr_icmp_t3_hdr_t));
           
           /* Send packet to source address */
-	printf("Attempting to send ICMP host unreachable to queued ARP requests");
+	fprintf(stderr,"Attempting to send ICMP host unreachable to queued ARP requests\n");
 		print_hdrs(icmp_pkt,icmp_len);
           sr_send_packet(sr, icmp_pkt, icmp_len, out_iface->name);
         }
@@ -305,7 +305,7 @@ void sr_handlepacket_arp(struct sr_instance *sr, uint8_t *pkt,
 	 struct sr_packet *req_list = req->packets;
 	    
 	 while(req_list){
-	printf("Attempting to send the queued arp request packet");
+	fprintf(stderr,"Attempting to send the queued arp request packet\n");
 	print_hdrs(req_list->buf,req_list->len);
 		 
 	 sr_send_packet(sr,req_list->buf,req_list->len,req_list->iface);
@@ -460,7 +460,7 @@ void sr_handlepacket(struct sr_instance* sr,
               send_pkt_icmp->icmp_code = 0;
               send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
 
-		printf("Attempting to send the following ICMP Response packet");
+		fprintf(stderr,"Attempting to send the following ICMP Response packet\n");
 		print_hdrs(send_pkt, send_pkt_len);
 			
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
@@ -497,7 +497,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_icmp->icmp_code = 3;
           send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
 	      
-	      printf("Attempting to send the following ICMP Port unreachable packet");
+	      fprintf(stderr"Attempting to send the following ICMP Port unreachable packet\n");
 		print_hdrs(send_pkt, send_pkt_len);
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
@@ -535,7 +535,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_icmp->icmp_code = 0;
           send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
 
-		printf("Attempting to send the following ICMP Time Exceeded packet");
+		fprintf("Attempting to send the following ICMP Time Exceeded packet\n");
 		print_hdrs(send_pkt, send_pkt_len);
 		
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
@@ -586,7 +586,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_icmp->icmp_code = 0;
           send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
 		
-		printf("Attempting to send the following ICMP Network unreachable packet");
+		fprintf(stderr,"Attempting to send the following ICMP Network unreachable packet\n");
 		print_hdrs(send_pkt, send_pkt_len);
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
@@ -627,7 +627,7 @@ void sr_handlepacket(struct sr_instance* sr,
               
           send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
 		
-		printf("Attempting to send the following ICMP Host unreachable packet");
+		fprintf(stderr,"Attempting to send the following ICMP Host unreachable packet\n");
 		print_hdrs(send_pkt, send_pkt_len);
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
@@ -637,7 +637,7 @@ void sr_handlepacket(struct sr_instance* sr,
 	memcpy(ehdr->ether_dhost, arp_entry->mac, ETHER_ADDR_LEN);
 	memcpy(ehdr->ether_shost, rt_entry->interface, ETHER_ADDR_LEN);
 
-		printf("Attempting to forward the following packet");
+		fprintf(stderr,"Attempting to forward the following packet\n");
 		print_hdrs(packet, len);
 		
         sr_send_packet(sr, packet, len, rt_entry->interface);
