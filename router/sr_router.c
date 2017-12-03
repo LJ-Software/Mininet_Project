@@ -309,11 +309,11 @@ void sr_handlepacket_arp(struct sr_instance *sr, uint8_t *pkt,
 
 			/*sr_ethernet_hdr_t *packet_linkedlist_ethernet = (sr_ethernet_hdr_t *)(packet_linkedlist->buf);
 			sr_arp_hdr_t *packet_linkedlist_arp = (sr_arp_hdr_t *)(packet_linkedlist->buf + sizeof(sr_ethernet_hdr_t));
-			*/
+			
 			
 			memcpy(packet_linkedlist_ethernet->ether_shost, packet_linkedlist_arp->ar_tha, ETHER_ADDR_LEN * sizeof(uint8_t));
 			memcpy(packet_linkedlist_ethernet->ether_dhost, packet_linkedlist_arp->ar_sha, ETHER_ADDR_LEN * sizeof(uint8_t));
-
+			*/
 			/*Sends packet to the linked list*/
 			sr_send_packet(sr,packet_linkedlist,packet_linkedlist->len,packet_linkedlist->iface);
 
