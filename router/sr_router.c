@@ -197,7 +197,7 @@ void sr_handle_arpreq(struct sr_instance *sr, struct sr_arpreq *req,
           sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(buf + sizeof(sr_ethernet_hdr_t));
           /* Populate IP header */
           icmp_ip->ip_tos = iphdr->ip_tos;
-          icmp_ip->ip_len = sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t);
+          icmp_ip->ip_len = sizeof(sr_ip_hdr_t) + sizeof(icmp_t3_hdr_t);
           icmp_ip->ip_id = iphdr->ip_id;
           icmp_ip->ip_off = 0x0000;
           icmp_ip->ip_ttl = 0xFF;
@@ -216,7 +216,7 @@ void sr_handle_arpreq(struct sr_instance *sr, struct sr_arpreq *req,
           icmp_t3_hdr->next_mtu = 0x0000;
           memcpy(icmp_t3_hdr->data, iphdr, ICMP_DATA_SIZE);
           /* Calculate ICMP checksum */
-          icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(sr_icmp_t3_hdr_t));
+          icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(icmp_t3_hdr));
           
           /* Send packet to source address */
           sr_send_packet(sr, icmp_pkt, icmp_len, out_iface->name);
@@ -438,8 +438,9 @@ void sr_handlepacket(struct sr_instance* sr,
               send_pkt_ip->ip_ttl = 255;
               send_pkt_ip->ip_p = 1;
               send_pkt_ip->ip_sum = 0;
-              send_pkt_ip->ip_src = iphdr->ip_dst;
-              send_pkt_ip->ip_dst = iphdr->ip_src;
+              uint32_t ip_new_src = iphdr->ip_src;;
+          send_pkt_ip->ip_src = iphdr->ip_dst;
+          send_pkt_ip->ip_dst = iphdr->ip_new_src;
               
               send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
 
@@ -470,8 +471,9 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ip_ttl = 255;
           send_pkt_ip->ip_p = 1;
           send_pkt_ip->ip_sum = 0;
+          uint32_t ip_new_src = iphdr->ip_src;;
           send_pkt_ip->ip_src = iphdr->ip_dst;
-          send_pkt_ip->ip_dst = iphdr->ip_src;
+          send_pkt_ip->ip_dst = iphdr->ip_new_src;
               
           send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
 
@@ -503,8 +505,9 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ip_ttl = 255;
           send_pkt_ip->ip_p = 1;
           send_pkt_ip->ip_sum = 0;
+          uint32_t ip_new_src = iphdr->ip_src;;
           send_pkt_ip->ip_src = iphdr->ip_dst;
-          send_pkt_ip->ip_dst = iphdr->ip_src;
+          send_pkt_ip->ip_dst = iphdr->ip_new_src;
               
           send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
 
@@ -549,8 +552,9 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ip_ttl = 255;
           send_pkt_ip->ip_p = 1;
           send_pkt_ip->ip_sum = 0;
+          uint32_t ip_new_src = iphdr->ip_src;;
           send_pkt_ip->ip_src = iphdr->ip_dst;
-          send_pkt_ip->ip_dst = iphdr->ip_src;
+          send_pkt_ip->ip_dst = iphdr->ip_new_src;
               
           send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
 
@@ -564,14 +568,14 @@ void sr_handlepacket(struct sr_instance* sr,
           iphdr->ip_ttl -= 1;
 	iphdr->ip_sum = cksum(iphdr, sizeof(sr_ip_hdr_t));
         /* if there is a match check the ARP cache for MAC address */
-	struct sr_arpentry arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
+	struct sr_arpentry *arp_entry = sr_arpcache_lookup((struct sr_arpcache *)(sr->cache),rt_entry->dest);
           /* if there is a miss send an ARP request to the IP dest*/
-	if(arp_entry == NULL){
+	if(arp_entry == (void *)){
             /* TODO: Build packet to send */
             sr_waitforarp(sr,packet,len,rt_entry->dest,rt_entry->interface);
 	}
-	arp_entry = sr_arpcache_lookup(sr->cache,rt_entry->dest);
-	if(arp_entry == NULL){
+	arp_entry = sr_arpcache_lookup((struct sr_arpcache *)(sr->cache),rt_entry->dest);
+	if(arp_entry == (void *)){
 		/* if there is not a match respond ICMP host unreachable */
 	    uint32_t send_pkt_len = sizeof(packet);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
@@ -590,16 +594,17 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ip_ttl = 255;
           send_pkt_ip->ip_p = 1;
           send_pkt_ip->ip_sum = 0;
-          send_pkt_ip->ip_src = sr->sr_addr.sin_addr;
-          send_pkt_ip->ip_dst = iphdr->ip_src;
+	uint32_t ip_new_src = iphdr->ip_src;;
+          send_pkt_ip->ip_src = iphdr->ip_dst;
+          send_pkt_ip->ip_dst = iphdr->ip_new_src;
               
           send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	}else{
           /* if there is a hit use the IP and MAC info to forward to next hop */
-	ehdr->ether_dhost = arp_entry->mac;
-	ehdr->ether_shost = rt_entry->interface;
+	ehdr->ether_dhost = arp_entry.mac;
+	memcpy(ehdr->ether_shost, rt_entry->interface, ETHER_ADDR_LEN);
 
         sr_send_packet(sr, packet, len, rt_entry->interface);
 	}
@@ -607,7 +612,6 @@ void sr_handlepacket(struct sr_instance* sr,
 	}
     } 
 
-	free(send_pkt);
       break;
 
       /* If neither */
