@@ -377,7 +377,7 @@ void sr_handlepacket(struct sr_instance* sr,
   sr_ethernet_hdr_t *ehdr = (sr_ethernet_hdr_t *) packet;
     
   /* Determine if packet is ARP or IP */
-    switch((uint16_t *)ethertype){
+    switch(ethertype(packet)){
       /* If ARP: pass to sr_handlepacket_arp function */
       case 2054:
       sr_handlepacket_arp(sr,packet,len,sr_get_interface(sr,interface));
@@ -427,8 +427,8 @@ void sr_handlepacket(struct sr_instance* sr,
               sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
               sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
-              send_pkt_eth->ether_dhost = (uint8_t[])(ehdr->ether_shost);
-              send_pkt_eth->ether_shost = (uint8_t[])(ehdr->ether_dhost);
+              memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
+        	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
               send_pkt_eth->ether_type = 2048;
 
               send_pkt_ip->ip_tos = iphdr->ip_tos;
@@ -459,8 +459,8 @@ void sr_handlepacket(struct sr_instance* sr,
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
           sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
-          send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
-          send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
+          memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
+        	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
           send_pkt_eth->ether_type = 2048;
 
           send_pkt_ip->ip_tos = iphdr->ip_tos;
@@ -492,8 +492,8 @@ void sr_handlepacket(struct sr_instance* sr,
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
           sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
-          send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
-          send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
+          memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
+        	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
           send_pkt_eth->ether_type = 2048;
 
           send_pkt_ip->ip_tos = iphdr->ip_tos;
@@ -538,8 +538,8 @@ void sr_handlepacket(struct sr_instance* sr,
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
           sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
-          send_pkt_eth->ether_dhost = (uint8_t[])(ehdr->ether_shost);
-          send_pkt_eth->ether_shost = (uint8_t[])(ehdr->ether_dhost);
+          memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
+        	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
           send_pkt_eth->ether_type = 2048;
 
           send_pkt_ip->ip_tos = iphdr->ip_tos;
@@ -579,8 +579,8 @@ void sr_handlepacket(struct sr_instance* sr,
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
 	
-          send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
-          send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
+          memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
+        memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
           send_pkt_eth->ether_type = 2048;
 
           send_pkt_ip->ip_tos = iphdr->ip_tos;
