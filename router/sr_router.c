@@ -446,6 +446,9 @@ void sr_handlepacket(struct sr_instance* sr,
               send_pkt_icmp->icmp_code = 0;
               send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
 
+		printf("Attempting to send the following ICMP Response packet");
+		print_hdrs(send_pkt, send_pkt_len);
+			
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	free(send_pkt);
           break;
@@ -479,6 +482,9 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_icmp->icmp_type = 3;
           send_pkt_icmp->icmp_code = 3;
           send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
+	      
+	      printf("Attempting to send the following ICMP Port unreachable packet");
+		print_hdrs(send_pkt, send_pkt_len);
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	  free(send_pkt);
@@ -515,6 +521,9 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_icmp->icmp_code = 0;
           send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
 
+		printf("Attempting to send the following ICMP Time Exceeded packet");
+		print_hdrs(send_pkt, send_pkt_len);
+		
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	free(send_pkt);
 	    } else {
@@ -562,6 +571,9 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_icmp->icmp_type = 3;
           send_pkt_icmp->icmp_code = 0;
           send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
+		
+		printf("Attempting to send the following ICMP Network unreachable packet");
+		print_hdrs(send_pkt, send_pkt_len);
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	free(send_pkt);
@@ -600,6 +612,9 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ip_dst = ip_new_src;
               
           send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
+		
+		printf("Attempting to send the following ICMP Host unreachable packet");
+		print_hdrs(send_pkt, send_pkt_len);
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	free(send_pkt);
@@ -608,6 +623,9 @@ void sr_handlepacket(struct sr_instance* sr,
 	memcpy(ehdr->ether_dhost, arp_entry->mac, ETHER_ADDR_LEN);
 	memcpy(ehdr->ether_shost, rt_entry->interface, ETHER_ADDR_LEN);
 
+		printf("Attempting to forward the following packet");
+		print_hdrs(packet, len);
+		
         sr_send_packet(sr, packet, len, rt_entry->interface);
 	}
 	}
