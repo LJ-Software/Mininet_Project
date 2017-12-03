@@ -406,8 +406,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
     if_walker = sr->if_list;
     
-    while(if_walker->next)
-    {
+    while(if_walker->next){
         if_walker = if_walker->next;
         if (iphdr->ip_dst == if_walker.ip){
           isDestinedForRouter = true;
@@ -439,7 +438,7 @@ void sr_handlepacket(struct sr_instance* sr,
               send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
               send_pkt_ip->ip_id = iphdr->ip_id;
               send_pkt_ip->ip_off = 0;
-              send_pkt_ip->ttl = 255;
+              send_pkt_ip->ip_ttl = 255;
               send_pkt_ip->ip_p = 1;
               send_pkt_ip->ip_sum = 0;
               send_pkt_ip->ip_src = sr->sr_addr;
@@ -471,7 +470,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
           send_pkt_ip->ip_id = iphdr->ip_id;
           send_pkt_ip->ip_off = 0;
-          send_pkt_ip->ttl = 255;
+          send_pkt_ip->ip_ttl = 255;
           send_pkt_ip->ip_p = 1;
           send_pkt_ip->ip_sum = 0;
           send_pkt_ip->ip_src = sr->sr_addr;
@@ -487,16 +486,99 @@ void sr_handlepacket(struct sr_instance* sr,
       }
     /* if the packet is NOT destined for this router */
     } else {
-      /* check routing table for longest matching prefix IP address */
-        /* if there is not a match respond ICMP network unreachable */
+	/* Check if ttl is <= 1. if it is respond with ICMP time exceeded */
+	if (iphdr->ip_ttl <= 1){
+	    unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr) + sizeof(sr_icmp_hdr);
+          uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
+
+          sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
+          sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
+          sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+
+          send_pkt_eth->ether_dhost = ehdr->ether_shost;
+          send_pkt_eth->ether_shost = ehdr->ether_dhost;
+          send_pkt_eth->ether_type = 2048;
+
+          send_pkt_ip->ip_tos = iphdr->ip_tos;
+          send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
+          send_pkt_ip->ip_id = iphdr->ip_id;
+          send_pkt_ip->ip_off = 0;
+          send_pkt_ip->ttl = 255;
+          send_pkt_ip->ip_p = 1;
+          send_pkt_ip->ip_sum = 0;
+          send_pkt_ip->ip_src = sr->sr_addr;
+          send_pkt_ip->ip_dst = iphdr->ip_src;
+              
+          send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
+
+          send_pkt_icmp->icmp_type = 11;
+          send_pkt_icmp->icmp_code = 0;
+          send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
+
+          sr_send_packet(sr, send_pkt, send_pkt_len, interface);
+	    } else {
+      	/* check routing table for longest matching prefix IP address */
+	bool isOnRoutingTable = false;
+	struct sr_rt* rt_entry = 0;
+		
+	struct sr_rt* rt_walker = 0;
+
+    	rt_walker = sr->routing_table;
+    
+    	while(rt_walker->next){
+        	rt_walker = rt_walker->next;
+        	if (iphdr->ip_dst == rt_walker.dest){
+          	isOnRoutingTable = true;
+		rt_entry = rt_walker;
+        	}
+    	}
+	if(!isOnRoutingTable){
+        	/* if there is not a match respond ICMP network unreachable */
+	    unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr) + sizeof(sr_icmp_hdr);
+          uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
+
+          sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
+          sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
+          sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+
+          send_pkt_eth->ether_dhost = ehdr->ether_shost;
+          send_pkt_eth->ether_shost = ehdr->ether_dhost;
+          send_pkt_eth->ether_type = 2048;
+
+          send_pkt_ip->ip_tos = iphdr->ip_tos;
+          send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
+          send_pkt_ip->ip_id = iphdr->ip_id;
+          send_pkt_ip->ip_off = 0;
+          send_pkt_ip->ttl = 255;
+          send_pkt_ip->ip_p = 1;
+          send_pkt_ip->ip_sum = 0;
+          send_pkt_ip->ip_src = sr->sr_addr;
+          send_pkt_ip->ip_dst = iphdr->ip_src;
+              
+          send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
+
+          send_pkt_icmp->icmp_type = 3;
+          send_pkt_icmp->icmp_code = 0;
+          send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
+
+          sr_send_packet(sr, send_pkt, send_pkt_len, interface);
+	} else{
         /* if there is a match check the ARP cache for MAC address */
+	struct sr_arpentry *arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
           /* if there is a miss send an ARP request to the IP dest*/
+	if(arp_entry == NULL){
             /* TODO: Build packet to send */
-            sr_send_arprequest();
+            sr_waitforarp(sr,packet,len,rt_entry.dest,rt_entry.interface);
+	}else{
           /* if there is a hit use the IP and MAC info to forward to next hop */
             /* TODO: Build a packet to send */
+	}
+	}
+	}
     } 
 
+	free(send_pkt_len);
+	free(send_pkt);
       break;
 
       /* If neither */
