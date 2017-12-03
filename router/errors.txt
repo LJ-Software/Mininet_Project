@@ -1,18 +1,18 @@
 gcc -MM -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c  > .sr_router.d
 gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c -o sr_router.o
 sr_router.c: In function ‘sr_handlepacket’:
-sr_router.c:572:9: error: incompatible type for argument 2 of ‘sr_arpcache_lookup’
-  struct sr_arpentry *arp_entry = sr_arpcache_lookup(&(sr->cache),rt_entry->dest);
-         ^
-In file included from sr_router.h:17:0,
-                 from sr_router.c:22:
-sr_arpcache.h:111:21: note: expected ‘uint32_t’ but argument is of type ‘struct in_addr’
- struct sr_arpentry *sr_arpcache_lookup(struct sr_arpcache *cache, uint32_t ip);
-                     ^
 sr_router.c:576:13: warning: passing argument 5 of ‘sr_waitforarp’ from incompatible pointer type [enabled by default]
              sr_waitforarp(sr,packet,len,iphdr->ip_dst,rt_entry->interface);
              ^
 sr_router.c:257:6: note: expected ‘struct sr_if *’ but argument is of type ‘char *’
  void sr_waitforarp(struct sr_instance *sr, uint8_t *pkt,
       ^
-make: *** [sr_router.o] Error 1
+gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_main.c -o sr_main.o
+gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_if.c -o sr_if.o
+gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_rt.c -o sr_rt.o
+gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_vns_comm.c -o sr_vns_comm.o
+gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_utils.c -o sr_utils.o
+gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_dumper.c -o sr_dumper.o
+gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_arpcache.c -o sr_arpcache.o
+gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sha1.c -o sha1.o
+gcc -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ -o sr sr_router.o sr_main.o sr_if.o sr_rt.o sr_vns_comm.o sr_utils.o sr_dumper.o sr_arpcache.o sha1.o -lnsl -lresolv -lm -lpthread 
