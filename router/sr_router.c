@@ -171,7 +171,7 @@ void sr_handle_arpreq(struct sr_instance *sr, struct sr_arpreq *req,
       /* TODO: send ICMP host uncreachable to the source address of all    */
       /* packets waiting on this request                                   */
 struct sr_packet *pack = req->packets;
-      unsigned int icmp_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr) + sizeof(sr_icmp_t3_hdr_t);
+      unsigned int icmp_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t);
       uint8_t *icmp_pkt = (uint8_t *)malloc(icmp_len);
       if (NULL == icmp_pkt)
       {
@@ -196,27 +196,27 @@ struct sr_packet *pack = req->packets;
           
           sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(buf + sizeof(sr_ethernet_hdr_t));
           /* Populate IP header */
-          icmp_ip->tos = iphdr->tos;
-          icmp_ip->len = sizeof(sr_ip_hdr) + sizeof(icmp_t3_hdr);
-          icmp_ip->id = iphdr->id;
-          icmp_ip->off = 0x0000;
-          icmp_ip->ttl = 0xFF;
-          icmp_ip->p = 0x01;
-          icmp_ip->sum = 0x0000;
+          icmp_ip->ip_tos = iphdr->ip_tos;
+          icmp_ip->ip_len = sizeof(sr_ip_hdr) + sizeof(icmp_t3_hdr);
+          icmp_ip->ip_id = iphdr->ip_id;
+          icmp_ip->ip_off = 0x0000;
+          icmp_ip->ip_ttl = 0xFF;
+          icmp_ip->ip_p = 0x01;
+          icmp_ip->ip_sum = 0x0000;
           icmp_ip->ip_src = out_iface->ip;
           icmp_ip->ip_dst = iphdr->ip_src;
           /* Calculate IP checksum */
-          icmp_ip->sum = cksum(icmp_ip, sizeof(sr_ip_hdr));
+          icmp_ip->ip_sum = cksum(icmp_ip, sizeof(sr_ip_hdr));
           
           /* Populate ICMP header */
           icmp_t3_hdr->icmp_type = 0x03;
           icmp_t3_hdr->icmp_code = 0x01;
-          icmp_t3_hdr->sum = 0x0000;
+          icmp_t3_hdr->icmp_sum = 0x0000;
           icmp_t3_hdr->unused = 0x0000;
           icmp_t3_hdr->next_mtu = 0x0000;
           memcpy(icmp_t3_hdr->data, iphdr, ICMP_DATA_SIZE);
           /* Calculate ICMP checksum */
-          icmp_t3_hdr->sum = cksum(icmp_t3_hdr, sizeof(icmp_t3_hdr));
+          icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(icmp_t3_hdr));
           
           /* Send packet to source address */
           sr_send_packet(sr, icmp_pkt, icmp_len, out_iface);
