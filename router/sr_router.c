@@ -420,10 +420,8 @@ void sr_handlepacket(struct sr_instance* sr,
         sr_icmp_hdr_t *icmphdr = (sr_icmp_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
         switch(icmphdr->icmp_type){
           case 8:
-          /* decrement the ttl */
-          iphdr->ip_ttl -= 1;
           /* Build packet to send */
-              unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr) + sizeof(sr_icmp_hdr);
+              unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr);
               uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
               sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
@@ -455,7 +453,7 @@ void sr_handlepacket(struct sr_instance* sr,
         }
         /* if the IP protocol is TCP (6) or UDP (17): respond with port unreachable */
       } else if (iphdr->ip_p == 6 || iphdr->ip_p == 17){
-          unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr) + sizeof(sr_icmp_hdr);
+          unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
@@ -488,7 +486,7 @@ void sr_handlepacket(struct sr_instance* sr,
     } else {
 	/* Check if ttl is <= 1. if it is respond with ICMP time exceeded */
 	if (iphdr->ip_ttl <= 1){
-	    unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr) + sizeof(sr_icmp_hdr);
+	    unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
@@ -534,7 +532,7 @@ void sr_handlepacket(struct sr_instance* sr,
     	}
 	if(!isOnRoutingTable){
         	/* if there is not a match respond ICMP network unreachable */
-	    unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr) + sizeof(sr_icmp_hdr);
+	    unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
@@ -563,6 +561,9 @@ void sr_handlepacket(struct sr_instance* sr,
 
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	} else{
+	/* decrement the ttl & recalculate checksum */
+          iphdr->ip_ttl -= 1;
+	iphdr->ip_sum = cksum(iphdr, sizeof(sr_ip_hdr_t));
         /* if there is a match check the ARP cache for MAC address */
 	struct sr_arpentry *arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
           /* if there is a miss send an ARP request to the IP dest*/
