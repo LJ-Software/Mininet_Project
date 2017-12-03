@@ -219,6 +219,8 @@ void sr_handle_arpreq(struct sr_instance *sr, struct sr_arpreq *req,
           icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(sr_icmp_t3_hdr_t));
           
           /* Send packet to source address */
+	printf("Attempting to send ICMP host unreachable to queued ARP requests");
+		print_hdrs(icmp_pkt,icmp_len);
           sr_send_packet(sr, icmp_pkt, icmp_len, out_iface->name);
         }
         /* Prepare next packet */
