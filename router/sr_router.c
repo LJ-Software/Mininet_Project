@@ -305,7 +305,7 @@ void sr_handlepacket_arp(struct sr_instance *sr, uint8_t *pkt,
     {
       /*********************************************************************/
       /* TODO: send all packets on the req->packets linked list            */
- /struct sr_packet *packet_linkedlist = req->packets; 
+ struct sr_packet *packet_linkedlist = req->packets; 
 
 	printf("ARP Packet: ");
 	print_hdrs(pkt,len);
@@ -568,13 +568,13 @@ void sr_handlepacket(struct sr_instance* sr,
           iphdr->ip_ttl -= 1;
 	iphdr->ip_sum = cksum(iphdr, sizeof(sr_ip_hdr_t));
         /* if there is a match check the ARP cache for MAC address */
-	struct sr_arpentry *arp_entry = sr_arpcache_lookup((sr->cache)*,rt_entry->dest);
+	struct sr_arpentry *arp_entry = sr_arpcache_lookup(*(sr->cache),rt_entry->dest);
           /* if there is a miss send an ARP request to the IP dest*/
 	if(arp_entry == 0){
             /* TODO: Build packet to send */
-            sr_waitforarp(sr,packet,len,rt_entry->dest,rt_entry->interface);
+            sr_waitforarp(sr,packet,len,iphdr->ip_dst,(char *)(rt_entry->interface));
 	}
-	arp_entry = sr_arpcache_lookup((sr->cache)*,rt_entry->dest);
+	arp_entry = sr_arpcache_lookup(*(sr->cache),iphdr->ip_dst);
 	if(arp_entry == 0){
 		/* if there is not a match respond ICMP host unreachable */
 	    uint32_t send_pkt_len = sizeof(packet);
@@ -603,7 +603,7 @@ void sr_handlepacket(struct sr_instance* sr,
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	}else{
           /* if there is a hit use the IP and MAC info to forward to next hop */
-	ehdr->ether_dhost = arp_entry.mac;
+	ehdr->ether_dhost = arp_entry->mac;
 	memcpy(ehdr->ether_shost, rt_entry->interface, ETHER_ADDR_LEN);
 
         sr_send_packet(sr, packet, len, rt_entry->interface);
