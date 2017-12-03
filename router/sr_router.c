@@ -305,25 +305,24 @@ void sr_handlepacket_arp(struct sr_instance *sr, uint8_t *pkt,
     {
       /*********************************************************************/
       /* TODO: send all packets on the req->packets linked list            */
- //Initialize reqst_len and reqst_pkt to send packet to the linked list
-	unsigned int reqst_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_arp_hdr_t);
-    uint8_t *reqst_pkt = (uint8_t *)malloc(reqst_len);
+ /struct sr_packet *packet_linkedlist = req->packets; 
 
-	//Sends packets to the linked list
-	sr_send_packet(sr,reqst_pkt,reqst_len,req->packets);
-		for(int i = 0; i < sizeof(req); i++){
-			if(reqst_pkt != NULL){
-				//Send ARP reply
-				sr_send_arpreply(sr,pkt,len,src_iface);
-				//Update ARP cache with contents of ARP Reply
-				struct sr_arpreq *req = sr_arpcache_insert(&(sr->cache), arphdr->ar_sha, 
-				arphdr->ar_sip);
-				//Send to handle arp req method 
-				sr_handle_arpreq(sr,req,src_iface);
-			}
+	printf("ARP Packet: ");
+	print_hdrs(pkt,len);
+
+		while(packet_linkedlist != NULL){
+
+			sr_ethernet_hdr_t *packet_linkedlist_ethernet = (sr_ethernet_hdr_t *)(packet_linkedlist->buf);
+			
+			memcpy(packet_linkedlist->ether_shost, arp_header->ether_dhost, ETHER_ADDR_LEN * sizeof(uint8_t));
+			memcpy(packet_linkedlist->ether_dhost, arp_header->ether_shost, ETHER_ADDR_LEN * sizeof(uint8_t));
+
+			//Sends packet to the linked list
+			sr_send_packet(sr,packet_linkedlist->buf,packet_linkedlist->len,packet_linkedlist->iface);
+
+			//After the packet is sent it is directed to the next one 
+			packet_linkedlist = packet_linkedlist->next;
 		}
-
-
       /*********************************************************************/
 
       /* Release ARP request entry */
