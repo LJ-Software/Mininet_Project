@@ -197,7 +197,7 @@ void sr_handle_arpreq(struct sr_instance *sr, struct sr_arpreq *req,
           sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(buf + sizeof(sr_ethernet_hdr_t));
           /* Populate IP header */
           icmp_ip->ip_tos = iphdr->ip_tos;
-          icmp_ip->ip_len = sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t);
+          icmp_ip->ip_len = sizeof(sr_ip_hdr_t) + sizeof(icmp_t3_hdr_t);
           icmp_ip->ip_id = iphdr->ip_id;
           icmp_ip->ip_off = 0x0000;
           icmp_ip->ip_ttl = 0xFF;
@@ -377,7 +377,7 @@ void sr_handlepacket(struct sr_instance* sr,
   sr_ethernet_hdr_t *ehdr = (sr_ethernet_hdr_t *) packet;
     
   /* Determine if packet is ARP or IP */
-    switch((uint16_t)ethertype){
+    switch((uint16_t *)ethertype){
       /* If ARP: pass to sr_handlepacket_arp function */
       case 2054:
       sr_handlepacket_arp(sr,packet,len,sr_get_interface(sr,interface));
@@ -427,8 +427,8 @@ void sr_handlepacket(struct sr_instance* sr,
               sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
               sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
-              send_pkt_eth->ether_dhost = (uint8_t[6])(ehdr->ether_shost);
-              send_pkt_eth->ether_shost = (uint8_t[6])(ehdr->ether_dhost);
+              send_pkt_eth->ether_dhost = (uint8_t[])(ehdr->ether_shost);
+              send_pkt_eth->ether_shost = (uint8_t[])(ehdr->ether_dhost);
               send_pkt_eth->ether_type = 2048;
 
               send_pkt_ip->ip_tos = iphdr->ip_tos;
@@ -500,7 +500,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
           send_pkt_ip->ip_id = iphdr->ip_id;
           send_pkt_ip->ip_off = 0;
-          send_pkt_ip->ttl = 255;
+          send_pkt_ip->ip_ttl = 255;
           send_pkt_ip->ip_p = 1;
           send_pkt_ip->ip_sum = 0;
           send_pkt_ip->ip_src = iphdr->ip_dst;
@@ -515,7 +515,7 @@ void sr_handlepacket(struct sr_instance* sr,
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	    } else {
       	/* check routing table for longest matching prefix IP address */
-	bool isOnRoutingTable = false;
+	int isOnRoutingTable = 0;
 	struct sr_rt* rt_entry = 0;
 		
 	struct sr_rt* rt_walker = 0;
@@ -524,12 +524,12 @@ void sr_handlepacket(struct sr_instance* sr,
     
     	while(rt_walker->next){
         	rt_walker = rt_walker->next;
-        	if (iphdr->ip_dst == rt_walker.dest){
-          	isOnRoutingTable = true;
+        	if (iphdr->ip_dst == rt_walker->dest){
+          	isOnRoutingTable = 1;
 		rt_entry = rt_walker;
         	}
     	}
-	if(!isOnRoutingTable){
+	if(isOnRoutingTable == 0){
         	/* if there is not a match respond ICMP network unreachable */
 	    uint32_t send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
@@ -538,15 +538,15 @@ void sr_handlepacket(struct sr_instance* sr,
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
           sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
-          send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
-          send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
+          send_pkt_eth->ether_dhost = (uint8_t[])(ehdr->ether_shost);
+          send_pkt_eth->ether_shost = (uint8_t[])(ehdr->ether_dhost);
           send_pkt_eth->ether_type = 2048;
 
           send_pkt_ip->ip_tos = iphdr->ip_tos;
           send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
           send_pkt_ip->ip_id = iphdr->ip_id;
           send_pkt_ip->ip_off = 0;
-          send_pkt_ip->ttl = 255;
+          send_pkt_ip->ip_ttl = 255;
           send_pkt_ip->ip_p = 1;
           send_pkt_ip->ip_sum = 0;
           send_pkt_ip->ip_src = iphdr->ip_dst;
@@ -564,13 +564,13 @@ void sr_handlepacket(struct sr_instance* sr,
           iphdr->ip_ttl -= 1;
 	iphdr->ip_sum = cksum(iphdr, sizeof(sr_ip_hdr_t));
         /* if there is a match check the ARP cache for MAC address */
-	struct sr_arpentry *arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
+	struct sr_arpentry arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
           /* if there is a miss send an ARP request to the IP dest*/
 	if(arp_entry == NULL){
             /* TODO: Build packet to send */
-            sr_waitforarp(sr,packet,len,rt_entry.dest,rt_entry.interface);
+            sr_waitforarp(sr,packet,len,rt_entry->dest,rt_entry->interface);
 	}
-	arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
+	arp_entry = sr_arpcache_lookup(sr->cache,rt_entry->dest);
 	if(arp_entry == NULL){
 		/* if there is not a match respond ICMP host unreachable */
 	    uint32_t send_pkt_len = sizeof(packet);
