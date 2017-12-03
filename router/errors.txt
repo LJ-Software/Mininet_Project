@@ -1,10 +1,5 @@
 gcc -MM -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c  > .sr_router.d
 gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c -o sr_router.o
-sr_router.c: In function ‘sr_handle_arpreq’:
-sr_router.c:219:61: error: ‘sr_icmp_t3_hdr’ undeclared (first use in this function)
-           icmp_t3_hdr->icmp_sum = cksum(icmp_t3_hdr, sizeof(sr_icmp_t3_hdr));
-                                                             ^
-sr_router.c:219:61: note: each undeclared identifier is reported only once for each function it appears in
 sr_router.c: In function ‘sr_handlepacket_arp’:
 sr_router.c:308:2: error: expected expression before ‘/’ token
   /struct sr_packet *packet_linkedlist = req->packets; 
@@ -12,6 +7,7 @@ sr_router.c:308:2: error: expected expression before ‘/’ token
 sr_router.c:313:9: error: ‘packet_linkedlist’ undeclared (first use in this function)
    while(packet_linkedlist != NULL){
          ^
+sr_router.c:313:9: note: each undeclared identifier is reported only once for each function it appears in
 sr_router.c:317:43: error: ‘arp_header’ undeclared (first use in this function)
     memcpy(packet_linkedlist->ether_shost, arp_header->ether_dhost, ETHER_ADDR_LEN * sizeof(uint8_t));
                                            ^
@@ -28,10 +24,10 @@ sr_router.c: In function ‘sr_handlepacket’:
 sr_router.c:530:28: error: invalid operands to binary == (have ‘uint32_t’ and ‘struct in_addr’)
           if (iphdr->ip_dst == rt_walker->dest){
                             ^
-sr_router.c:571:61: error: cannot convert to a pointer type
-  struct sr_arpentry *arp_entry = sr_arpcache_lookup((struct sr_arpcache *)(sr->cache),rt_entry->dest);
-                                                             ^
-sr_router.c:571:61: error: incompatible type for argument 2 of ‘sr_arpcache_lookup’
+sr_router.c:571:65: error: expected expression before ‘,’ token
+  struct sr_arpentry *arp_entry = sr_arpcache_lookup((sr->cache)*,rt_entry->dest);
+                                                                 ^
+sr_router.c:571:65: error: incompatible type for argument 2 of ‘sr_arpcache_lookup’
 In file included from sr_router.h:17:0,
                  from sr_router.c:22:
 sr_arpcache.h:111:21: note: expected ‘uint32_t’ but argument is of type ‘struct in_addr’
@@ -49,10 +45,10 @@ sr_router.c:575:13: warning: passing argument 5 of ‘sr_waitforarp’ from inco
 sr_router.c:257:6: note: expected ‘struct sr_if *’ but argument is of type ‘char *’
  void sr_waitforarp(struct sr_instance *sr, uint8_t *pkt,
       ^
-sr_router.c:577:41: error: cannot convert to a pointer type
-  arp_entry = sr_arpcache_lookup((struct sr_arpcache *)(sr->cache),rt_entry->dest);
-                                         ^
-sr_router.c:577:41: error: incompatible type for argument 2 of ‘sr_arpcache_lookup’
+sr_router.c:577:45: error: expected expression before ‘,’ token
+  arp_entry = sr_arpcache_lookup((sr->cache)*,rt_entry->dest);
+                                             ^
+sr_router.c:577:45: error: incompatible type for argument 2 of ‘sr_arpcache_lookup’
 In file included from sr_router.h:17:0,
                  from sr_router.c:22:
 sr_arpcache.h:111:21: note: expected ‘uint32_t’ but argument is of type ‘struct in_addr’
