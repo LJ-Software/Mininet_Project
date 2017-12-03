@@ -570,9 +570,39 @@ void sr_handlepacket(struct sr_instance* sr,
 	if(arp_entry == NULL){
             /* TODO: Build packet to send */
             sr_waitforarp(sr,packet,len,rt_entry.dest,rt_entry.interface);
+	}
+	arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
+	if(arp_entry == NULL){
+		/* if there is not a match respond ICMP host unreachable */
+	    unsigned int send_pkt_len = sizeof(packet);
+          uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
+
+          sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
+          sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
+	
+          send_pkt_eth->ether_dhost = ehdr->ether_shost;
+          send_pkt_eth->ether_shost = ehdr->ether_dhost;
+          send_pkt_eth->ether_type = 2048;
+
+          send_pkt_ip->ip_tos = iphdr->ip_tos;
+          send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
+          send_pkt_ip->ip_id = iphdr->ip_id;
+          send_pkt_ip->ip_off = 0;
+          send_pkt_ip->ttl = 255;
+          send_pkt_ip->ip_p = 1;
+          send_pkt_ip->ip_sum = 0;
+          send_pkt_ip->ip_src = sr->sr_addr;
+          send_pkt_ip->ip_dst = iphdr->ip_src;
+              
+          send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
+
+          sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	}else{
           /* if there is a hit use the IP and MAC info to forward to next hop */
-            /* TODO: Build a packet to send */
+	ehdr->ether_dhost = arp_entry.mac;
+	ehdr->ether_shost = rt_entry.interface;
+
+        sr_send_packet(sr, packet, len, rt_entry.interface);
 	}
 	}
 	}
