@@ -414,20 +414,87 @@ void sr_handlepacket(struct sr_instance* sr,
         }
     }
 
+    /* if the packet IS destined for this router */
     if(isDestinedForRouter){
       /* if the IP protocol is ICMP: respond */
       if(iphdr->ip_p == 1){
-        sr_icmp_hdr *icmphdr = (sr_icmp_hdr *)(packet + sizeof(sr_ethernet_hdr_t) + iphdr->len);
+        sr_icmp_hdr_t *icmphdr = (sr_icmp_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
         switch(icmphdr->icmp_type){
           case 8:
           /* decrement the ttl */
           iphdr->ip_ttl -= 1;
-          sr_send_packet()
+          /* Build packet to send */
+              unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr) + sizeof(sr_icmp_hdr);
+              uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
+
+              sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
+              sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
+              sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+
+              send_pkt_eth->ether_dhost = ehdr->ether_shost;
+              send_pkt_eth->ether_shost = ehdr->ether_dhost;
+              send_pkt_eth->ether_type = 2048;
+
+              send_pkt_ip->ip_tos = iphdr->ip_tos;
+              send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
+              send_pkt_ip->ip_id = iphdr->ip_id;
+              send_pkt_ip->ip_off = 0;
+              send_pkt_ip->ttl = 255;
+              send_pkt_ip->ip_p = 1;
+              send_pkt_ip->ip_sum = 0;
+              send_pkt_ip->ip_src = sr->sr_addr;
+              send_pkt_ip->ip_dst = iphdr->ip_src;
+              
+              send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
+
+              send_pkt_icmp->icmp_type = 0;
+              send_pkt_icmp->icmp_code = 0;
+              send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
+
+          sr_send_packet(sr, send_pkt, send_pkt_len, interface);
           break;
         }
-      }
-    } else {
+        /* if the IP protocol is TCP (6) or UDP (17): respond with port unreachable */
+      } else if (iphdr->ip_p == 6 || iphdr->ip_p == 17){
+          unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr) + sizeof(sr_icmp_hdr);
+          uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
+          sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
+          sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
+          sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+
+          send_pkt_eth->ether_dhost = ehdr->ether_shost;
+          send_pkt_eth->ether_shost = ehdr->ether_dhost;
+          send_pkt_eth->ether_type = 2048;
+
+          send_pkt_ip->ip_tos = iphdr->ip_tos;
+          send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
+          send_pkt_ip->ip_id = iphdr->ip_id;
+          send_pkt_ip->ip_off = 0;
+          send_pkt_ip->ttl = 255;
+          send_pkt_ip->ip_p = 1;
+          send_pkt_ip->ip_sum = 0;
+          send_pkt_ip->ip_src = sr->sr_addr;
+          send_pkt_ip->ip_dst = iphdr->ip_src;
+              
+          send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
+
+          send_pkt_icmp->icmp_type = 3;
+          send_pkt_icmp->icmp_code = 3;
+          send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
+
+          sr_send_packet(sr, send_pkt, send_pkt_len, interface);
+      }
+    /* if the packet is NOT destined for this router */
+    } else {
+      /* check routing table for longest matching prefix IP address */
+        /* if there is not a match respond ICMP network unreachable */
+        /* if there is a match check the ARP cache for MAC address */
+          /* if there is a miss send an ARP request to the IP dest*/
+            /* TODO: Build packet to send */
+            sr_send_arprequest();
+          /* if there is a hit use the IP and MAC info to forward to next hop */
+            /* TODO: Build a packet to send */
     } 
 
       break;
