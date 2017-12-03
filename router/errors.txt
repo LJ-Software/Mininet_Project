@@ -1,33 +1,13 @@
 gcc -MM -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c  > .sr_router.d
 gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c -o sr_router.o
-sr_router.c: In function ‘sr_handlepacket_arp’:
-sr_router.c:317:28: error: ‘struct sr_packet’ has no member named ‘ether_shost’
-    memcpy(packet_linkedlist->ether_shost, arp_header->ether_dhost, ETHER_ADDR_LEN * sizeof(uint8_t));
-                            ^
-sr_router.c:317:43: error: ‘arp_header’ undeclared (first use in this function)
-    memcpy(packet_linkedlist->ether_shost, arp_header->ether_dhost, ETHER_ADDR_LEN * sizeof(uint8_t));
-                                           ^
-sr_router.c:317:43: note: each undeclared identifier is reported only once for each function it appears in
-sr_router.c:318:28: error: ‘struct sr_packet’ has no member named ‘ether_dhost’
-    memcpy(packet_linkedlist->ether_dhost, arp_header->ether_shost, ETHER_ADDR_LEN * sizeof(uint8_t));
-                            ^
-sr_router.c:320:4: error: expected expression before ‘/’ token
-    //Sends packet to the linked list
-    ^
-sr_router.c:323:4: error: expected expression before ‘/’ token
-    //After the packet is sent it is directed to the next one 
-    ^
-sr_router.c:315:23: warning: unused variable ‘packet_linkedlist_ethernet’ [-Wunused-variable]
-    sr_ethernet_hdr_t *packet_linkedlist_ethernet = (sr_ethernet_hdr_t *)(packet_linkedlist->buf);
-                       ^
 sr_router.c: In function ‘sr_handlepacket’:
-sr_router.c:530:28: error: invalid operands to binary == (have ‘uint32_t’ and ‘struct in_addr’)
+sr_router.c:531:28: error: invalid operands to binary == (have ‘uint32_t’ and ‘struct in_addr’)
           if (iphdr->ip_dst == rt_walker->dest){
                             ^
-sr_router.c:571:53: error: invalid type argument of unary ‘*’ (have ‘struct sr_arpcache’)
+sr_router.c:572:53: error: invalid type argument of unary ‘*’ (have ‘struct sr_arpcache’)
   struct sr_arpentry *arp_entry = sr_arpcache_lookup(*(sr->cache),rt_entry->dest);
                                                      ^
-sr_router.c:571:9: error: incompatible type for argument 2 of ‘sr_arpcache_lookup’
+sr_router.c:572:9: error: incompatible type for argument 2 of ‘sr_arpcache_lookup’
   struct sr_arpentry *arp_entry = sr_arpcache_lookup(*(sr->cache),rt_entry->dest);
          ^
 In file included from sr_router.h:17:0,
@@ -35,16 +15,16 @@ In file included from sr_router.h:17:0,
 sr_arpcache.h:111:21: note: expected ‘uint32_t’ but argument is of type ‘struct in_addr’
  struct sr_arpentry *sr_arpcache_lookup(struct sr_arpcache *cache, uint32_t ip);
                      ^
-sr_router.c:575:13: warning: passing argument 5 of ‘sr_waitforarp’ from incompatible pointer type [enabled by default]
+sr_router.c:576:13: warning: passing argument 5 of ‘sr_waitforarp’ from incompatible pointer type [enabled by default]
              sr_waitforarp(sr,packet,len,iphdr->ip_dst,(char *)(rt_entry->interface));
              ^
 sr_router.c:257:6: note: expected ‘struct sr_if *’ but argument is of type ‘char *’
  void sr_waitforarp(struct sr_instance *sr, uint8_t *pkt,
       ^
-sr_router.c:577:33: error: invalid type argument of unary ‘*’ (have ‘struct sr_arpcache’)
+sr_router.c:578:33: error: invalid type argument of unary ‘*’ (have ‘struct sr_arpcache’)
   arp_entry = sr_arpcache_lookup(*(sr->cache),iphdr->ip_dst);
                                  ^
-sr_router.c:606:20: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘unsigned char *’
+sr_router.c:607:20: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘unsigned char *’
   ehdr->ether_dhost = arp_entry->mac;
                     ^
 make: *** [sr_router.o] Error 1
