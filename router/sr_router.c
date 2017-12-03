@@ -377,14 +377,14 @@ void sr_handlepacket(struct sr_instance* sr,
   sr_ethernet_hdr_t *ehdr = (sr_ethernet_hdr_t *) packet;
     
   /* Determine if packet is ARP or IP */
-    switch(ethertype){
+    switch((uint16_t)ethertype){
       /* If ARP: pass to sr_handlepacket_arp function */
       case 2054:
       sr_handlepacket_arp(sr,packet,len,sr_get_interface(sr,interface));
       break;
     
       /* If IP: */
-      case 2048:
+      case 2048: ;
       sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t));
         /* Check if IP packet length meets minimum */
       if (len < (minlength + sizeof(sr_ip_hdr_t))) {
@@ -418,7 +418,7 @@ void sr_handlepacket(struct sr_instance* sr,
       if(iphdr->ip_p == 1){
         sr_icmp_hdr_t *icmphdr = (sr_icmp_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
         switch(icmphdr->icmp_type){
-          case 8:
+          case 8: ;
           /* Build packet to send */
               uint32_t send_pkt_len = (sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
               uint8_t *send_pkt = malloc(send_pkt_len);
@@ -427,8 +427,8 @@ void sr_handlepacket(struct sr_instance* sr,
               sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
               sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
-              send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
-              send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
+              send_pkt_eth->ether_dhost = (uint8_t[6])(ehdr->ether_shost);
+              send_pkt_eth->ether_shost = (uint8_t[6])(ehdr->ether_dhost);
               send_pkt_eth->ether_type = 2048;
 
               send_pkt_ip->ip_tos = iphdr->ip_tos;
@@ -438,7 +438,7 @@ void sr_handlepacket(struct sr_instance* sr,
               send_pkt_ip->ip_ttl = 255;
               send_pkt_ip->ip_p = 1;
               send_pkt_ip->ip_sum = 0;
-              send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
+              send_pkt_ip->ip_src = iphdr->ip_dst;
               send_pkt_ip->ip_dst = iphdr->ip_src;
               
               send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
@@ -452,7 +452,7 @@ void sr_handlepacket(struct sr_instance* sr,
         }
         /* if the IP protocol is TCP (6) or UDP (17): respond with port unreachable */
       } else if (iphdr->ip_p == 6 || iphdr->ip_p == 17){
-          unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr);
+          uint32_t send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
@@ -470,7 +470,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ip_ttl = 255;
           send_pkt_ip->ip_p = 1;
           send_pkt_ip->ip_sum = 0;
-          send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
+          send_pkt_ip->ip_src = iphdr->ip_dst;
           send_pkt_ip->ip_dst = iphdr->ip_src;
               
           send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
@@ -485,7 +485,7 @@ void sr_handlepacket(struct sr_instance* sr,
     } else {
 	/* Check if ttl is <= 1. if it is respond with ICMP time exceeded */
 	if (iphdr->ip_ttl <= 1){
-	    unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr);
+	    uint32_t send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
@@ -503,7 +503,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ttl = 255;
           send_pkt_ip->ip_p = 1;
           send_pkt_ip->ip_sum = 0;
-          send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
+          send_pkt_ip->ip_src = iphdr->ip_dst;
           send_pkt_ip->ip_dst = iphdr->ip_src;
               
           send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
@@ -531,7 +531,7 @@ void sr_handlepacket(struct sr_instance* sr,
     	}
 	if(!isOnRoutingTable){
         	/* if there is not a match respond ICMP network unreachable */
-	    unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr);
+	    uint32_t send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
@@ -549,7 +549,7 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ttl = 255;
           send_pkt_ip->ip_p = 1;
           send_pkt_ip->ip_sum = 0;
-          send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
+          send_pkt_ip->ip_src = iphdr->ip_dst;
           send_pkt_ip->ip_dst = iphdr->ip_src;
               
           send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
@@ -573,7 +573,7 @@ void sr_handlepacket(struct sr_instance* sr,
 	arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
 	if(arp_entry == NULL){
 		/* if there is not a match respond ICMP host unreachable */
-	    unsigned int send_pkt_len = sizeof(packet);
+	    uint32_t send_pkt_len = sizeof(packet);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
