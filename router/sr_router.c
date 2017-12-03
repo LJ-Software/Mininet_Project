@@ -223,13 +223,8 @@ void sr_handle_arpreq(struct sr_instance *sr, struct sr_arpreq *req,
         }
         /* Prepare next packet */
         pack = pack->next;
-        free(buf);
       } while(pack);
       free(icmp_pkt);
-      free(pack);
-
-
-
       /*********************************************************************/
 
       sr_arpreq_destroy(&(sr->cache), req);
