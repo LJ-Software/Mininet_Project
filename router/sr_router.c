@@ -303,6 +303,9 @@ void sr_handlepacket_arp(struct sr_instance *sr, uint8_t *pkt,
 	 struct sr_packet *req_list = req->packets;
 	    
 	 while(req->next){
+	printf("Attempting to send the queued arp request packet");
+	print_hdrs(req_list->buf,req_list->len);
+		 
 	 sr_send_packet(sr,req_list->buf,req_list->len,req_list->iface);
 	 req_list = req->next;
 	 }
