@@ -1,0 +1,194 @@
+gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c -o sr_router.o
+sr_router.c: In function ‘sr_handle_arpreq’:
+sr_router.c:174:66: error: ‘sr_ip_hdr’ undeclared (first use in this function)
+       unsigned int icmp_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr) + sizeof(sr_icmp_t3_hdr_t);
+                                                                  ^
+sr_router.c:174:66: note: each undeclared identifier is reported only once for each function it appears in
+sr_router.c:199:18: error: ‘sr_ip_hdr_t’ has no member named ‘tos’
+           icmp_ip->tos = iphdr->tos;
+                  ^
+sr_router.c:199:31: error: ‘sr_ip_hdr_t’ has no member named ‘tos’
+           icmp_ip->tos = iphdr->tos;
+                               ^
+sr_router.c:200:18: error: ‘sr_ip_hdr_t’ has no member named ‘len’
+           icmp_ip->len = sizeof(sr_ip_hdr) + sizeof(icmp_t3_hdr);
+                  ^
+sr_router.c:201:18: error: ‘sr_ip_hdr_t’ has no member named ‘id’
+           icmp_ip->id = iphdr->id;
+                  ^
+sr_router.c:201:30: error: ‘sr_ip_hdr_t’ has no member named ‘id’
+           icmp_ip->id = iphdr->id;
+                              ^
+sr_router.c:202:18: error: ‘sr_ip_hdr_t’ has no member named ‘off’
+           icmp_ip->off = 0x0000;
+                  ^
+sr_router.c:203:18: error: ‘sr_ip_hdr_t’ has no member named ‘ttl’
+           icmp_ip->ttl = 0xFF;
+                  ^
+sr_router.c:204:18: error: ‘sr_ip_hdr_t’ has no member named ‘p’
+           icmp_ip->p = 0x01;
+                  ^
+sr_router.c:205:18: error: ‘sr_ip_hdr_t’ has no member named ‘sum’
+           icmp_ip->sum = 0x0000;
+                  ^
+sr_router.c:209:18: error: ‘sr_ip_hdr_t’ has no member named ‘sum’
+           icmp_ip->sum = cksum(icmp_ip, sizeof(sr_ip_hdr));
+                  ^
+sr_router.c:214:22: error: ‘sr_icmp_t3_hdr_t’ has no member named ‘sum’
+           icmp_t3_hdr->sum = 0x0000;
+                      ^
+sr_router.c:219:22: error: ‘sr_icmp_t3_hdr_t’ has no member named ‘sum’
+           icmp_t3_hdr->sum = cksum(icmp_t3_hdr, sizeof(icmp_t3_hdr));
+                      ^
+sr_router.c:222:11: warning: passing argument 4 of ‘sr_send_packet’ from incompatible pointer type [enabled by default]
+           sr_send_packet(sr, icmp_pkt, icmp_len, out_iface);
+           ^
+In file included from sr_router.c:22:0:
+sr_router.h:63:5: note: expected ‘const char *’ but argument is of type ‘struct sr_if *’
+ int sr_send_packet(struct sr_instance* , uint8_t* , unsigned int , const char*);
+     ^
+sr_router.c: In function ‘sr_handlepacket_arp’:
+sr_router.c:308:2: error: expected expression before ‘/’ token
+  /struct sr_packet *packet_linkedlist = req->packets; 
+  ^
+sr_router.c:313:9: error: ‘packet_linkedlist’ undeclared (first use in this function)
+   while(packet_linkedlist != NULL){
+         ^
+sr_router.c:317:43: error: ‘arp_header’ undeclared (first use in this function)
+    memcpy(packet_linkedlist->ether_shost, arp_header->ether_dhost, ETHER_ADDR_LEN * sizeof(uint8_t));
+                                           ^
+sr_router.c:320:4: error: expected expression before ‘/’ token
+    //Sends packet to the linked list
+    ^
+sr_router.c:323:4: error: expected expression before ‘/’ token
+    //After the packet is sent it is directed to the next one 
+    ^
+sr_router.c:315:23: warning: unused variable ‘packet_linkedlist_ethernet’ [-Wunused-variable]
+    sr_ethernet_hdr_t *packet_linkedlist_ethernet = (sr_ethernet_hdr_t *)(packet_linkedlist->buf);
+                       ^
+sr_router.c: In function ‘sr_handlepacket’:
+sr_router.c:380:16: error: ‘sr_ethernet_hdr_t’ has no member named ‘ethertype’
+     switch(ehdr->ethertype){
+                ^
+sr_router.c:388:7: error: expected expression before ‘sr_ip_hdr_t’
+       sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t));
+       ^
+sr_router.c:396:40: error: ‘iphdr’ undeclared (first use in this function)
+             uint16_t _checksum = cksum(iphdr,iphdr->ip_len);
+                                        ^
+sr_router.c:402:5: error: unknown type name ‘bool’
+     bool isDestinedForRouter = false;
+     ^
+sr_router.c:402:32: error: ‘false’ undeclared (first use in this function)
+     bool isDestinedForRouter = false;
+                                ^
+sr_router.c:410:39: error: request for member ‘ip’ in something not a structure or union
+         if (iphdr->ip_dst == if_walker.ip){
+                                       ^
+sr_router.c:411:33: error: ‘true’ undeclared (first use in this function)
+           isDestinedForRouter = true;
+                                 ^
+sr_router.c:423:15: error: a label can only be part of a statement and a declaration is not a statement
+               unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr);
+               ^
+sr_router.c:423:100: error: ‘sr_icmp_hdr’ undeclared (first use in this function)
+               unsigned int send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr);
+                                                                                                    ^
+sr_router.c:424:15: error: expected expression before ‘uint8_t’
+               uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
+               ^
+sr_router.c:426:70: error: ‘send_pkt’ undeclared (first use in this function)
+               sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
+                                                                      ^
+sr_router.c:430:41: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
+               send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
+                                         ^
+sr_router.c:431:41: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
+               send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
+                                         ^
+sr_router.c:441:15: error: aggregate value used where an integer was expected
+               send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
+               ^
+sr_router.c:462:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
+           send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
+                                     ^
+sr_router.c:463:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
+           send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
+                                     ^
+sr_router.c:473:11: error: aggregate value used where an integer was expected
+           send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
+           ^
+sr_router.c:495:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
+           send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
+                                     ^
+sr_router.c:496:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
+           send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
+                                     ^
+sr_router.c:503:22: error: ‘sr_ip_hdr_t’ has no member named ‘ttl’
+           send_pkt_ip->ttl = 255;
+                      ^
+sr_router.c:506:11: error: aggregate value used where an integer was expected
+           send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
+           ^
+sr_router.c:518:2: error: unknown type name ‘bool’
+  bool isOnRoutingTable = false;
+  ^
+sr_router.c:527:40: error: request for member ‘dest’ in something not a structure or union
+          if (iphdr->ip_dst == rt_walker.dest){
+                                        ^
+sr_router.c:541:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
+           send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
+                                     ^
+sr_router.c:542:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
+           send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
+                                     ^
+sr_router.c:549:22: error: ‘sr_ip_hdr_t’ has no member named ‘ttl’
+           send_pkt_ip->ttl = 255;
+                      ^
+sr_router.c:552:11: error: aggregate value used where an integer was expected
+           send_pkt_ip->ip_src = (uint32_t)(sr->sr_addr);
+           ^
+sr_router.c:567:71: error: request for member ‘dest’ in something not a structure or union
+  struct sr_arpentry *arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
+                                                                       ^
+sr_router.c:567:9: error: incompatible type for argument 1 of ‘sr_arpcache_lookup’
+  struct sr_arpentry *arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
+         ^
+In file included from sr_router.h:17:0,
+                 from sr_router.c:22:
+sr_arpcache.h:111:21: note: expected ‘struct sr_arpcache *’ but argument is of type ‘struct sr_arpcache’
+ struct sr_arpentry *sr_arpcache_lookup(struct sr_arpcache *cache, uint32_t ip);
+                     ^
+sr_router.c:571:49: error: request for member ‘dest’ in something not a structure or union
+             sr_waitforarp(sr,packet,len,rt_entry.dest,rt_entry.interface);
+                                                 ^
+sr_router.c:571:63: error: request for member ‘interface’ in something not a structure or union
+             sr_waitforarp(sr,packet,len,rt_entry.dest,rt_entry.interface);
+                                                               ^
+sr_router.c:573:51: error: request for member ‘dest’ in something not a structure or union
+  arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
+                                                   ^
+sr_router.c:573:2: error: incompatible type for argument 1 of ‘sr_arpcache_lookup’
+  arp_entry = sr_arpcache_lookup(sr->cache,rt_entry.dest);
+  ^
+In file included from sr_router.h:17:0,
+                 from sr_router.c:22:
+sr_arpcache.h:111:21: note: expected ‘struct sr_arpcache *’ but argument is of type ‘struct sr_arpcache’
+ struct sr_arpentry *sr_arpcache_lookup(struct sr_arpcache *cache, uint32_t ip);
+                     ^
+sr_router.c:582:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
+           send_pkt_eth->ether_dhost = (uint8_t *)(ehdr->ether_shost);
+                                     ^
+sr_router.c:583:37: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘uint8_t *’
+           send_pkt_eth->ether_shost = (uint8_t *)(ehdr->ether_dhost);
+                                     ^
+sr_router.c:593:31: error: incompatible types when assigning to type ‘uint32_t’ from type ‘struct in_addr’
+           send_pkt_ip->ip_src = sr->sr_addr.sin_addr;
+                               ^
+sr_router.c:601:39: error: lvalue required as left operand of assignment
+  (unsigned char *)(ehdr->ether_dhost) = arp_entry->mac;
+                                       ^
+sr_router.c:602:39: error: lvalue required as left operand of assignment
+  (unsigned char *)(ehdr->ether_shost) = rt_entry->interface;
+                                       ^
+make: *** [sr_router.o] Error 1
