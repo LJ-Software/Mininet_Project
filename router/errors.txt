@@ -1,14 +1,11 @@
 gcc -MM -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c  > .sr_router.d
 gcc -c -g -Wall -ansi -D_DEBUG_ -D_GNU_SOURCE -D_LINUX_ sr_router.c -o sr_router.o
 sr_router.c: In function ‘sr_handlepacket’:
-sr_router.c:531:28: error: invalid operands to binary == (have ‘uint32_t’ and ‘struct in_addr’)
-          if (iphdr->ip_dst == rt_walker->dest){
-                            ^
-sr_router.c:572:53: error: invalid type argument of unary ‘*’ (have ‘struct sr_arpcache’)
-  struct sr_arpentry *arp_entry = sr_arpcache_lookup(*(sr->cache),rt_entry->dest);
-                                                     ^
+sr_router.c:531:46: error: invalid type argument of ‘->’ (have ‘struct in_addr’)
+          if (iphdr->ip_dst == rt_walker->dest->s_addr){
+                                              ^
 sr_router.c:572:9: error: incompatible type for argument 2 of ‘sr_arpcache_lookup’
-  struct sr_arpentry *arp_entry = sr_arpcache_lookup(*(sr->cache),rt_entry->dest);
+  struct sr_arpentry *arp_entry = sr_arpcache_lookup(&(sr->cache),rt_entry->dest);
          ^
 In file included from sr_router.h:17:0,
                  from sr_router.c:22:
@@ -21,10 +18,4 @@ sr_router.c:576:13: warning: passing argument 5 of ‘sr_waitforarp’ from inco
 sr_router.c:257:6: note: expected ‘struct sr_if *’ but argument is of type ‘char *’
  void sr_waitforarp(struct sr_instance *sr, uint8_t *pkt,
       ^
-sr_router.c:578:33: error: invalid type argument of unary ‘*’ (have ‘struct sr_arpcache’)
-  arp_entry = sr_arpcache_lookup(*(sr->cache),iphdr->ip_dst);
-                                 ^
-sr_router.c:607:20: error: incompatible types when assigning to type ‘uint8_t[6]’ from type ‘unsigned char *’
-  ehdr->ether_dhost = arp_entry->mac;
-                    ^
 make: *** [sr_router.o] Error 1
