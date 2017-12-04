@@ -196,6 +196,8 @@ void sr_handle_arpreq(struct sr_instance *sr, struct sr_arpreq *req,
           
           sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(buf + sizeof(sr_ethernet_hdr_t));
           /* Populate IP header */
+		  send_pkt_ip->ip_v = 4;
+		send_pkt_ip->ip_hl = (sizeof(sr_ip_hdr_t)/4);
           icmp_ip->ip_tos = iphdr->ip_tos;
           icmp_ip->ip_len = sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t);
           icmp_ip->ip_id = iphdr->ip_id;
