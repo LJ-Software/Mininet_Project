@@ -448,7 +448,7 @@ void sr_handlepacket(struct sr_instance* sr,
 			send_pkt_ip->ip_v = 4;
 	send_pkt_ip->ip_hl = (sizeof(sr_ip_hdr_t)/4);
               send_pkt_ip->ip_tos = iphdr->ip_tos;
-              send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
+              send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t)));
               send_pkt_ip->ip_id = iphdr->ip_id;
               send_pkt_ip->ip_off = 0;
               send_pkt_ip->ip_ttl = 255;
@@ -487,7 +487,7 @@ void sr_handlepacket(struct sr_instance* sr,
 	      send_pkt_ip->ip_v = 4;
 	send_pkt_ip->ip_hl = (sizeof(sr_ip_hdr_t)/4);
           send_pkt_ip->ip_tos = iphdr->ip_tos;
-          send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
+          send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t)));
           send_pkt_ip->ip_id = iphdr->ip_id;
           send_pkt_ip->ip_off = 0;
           send_pkt_ip->ip_ttl = 255;
@@ -527,7 +527,7 @@ void sr_handlepacket(struct sr_instance* sr,
 		send_pkt_ip->ip_v = 4;
 	send_pkt_ip->ip_hl = (sizeof(sr_ip_hdr_t)/4);
           send_pkt_ip->ip_tos = iphdr->ip_tos;
-          send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
+          send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t)));
           send_pkt_ip->ip_id = iphdr->ip_id;
           send_pkt_ip->ip_off = 0;
           send_pkt_ip->ip_ttl = 255;
@@ -580,7 +580,7 @@ void sr_handlepacket(struct sr_instance* sr,
 		send_pkt_ip->ip_v = 4;
 	send_pkt_ip->ip_hl = (sizeof(sr_ip_hdr_t)/4);
           send_pkt_ip->ip_tos = iphdr->ip_tos;
-          send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
+          send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t)));
           send_pkt_ip->ip_id = iphdr->ip_id;
           send_pkt_ip->ip_off = 0;
           send_pkt_ip->ip_ttl = 255;
@@ -627,7 +627,7 @@ void sr_handlepacket(struct sr_instance* sr,
 	send_pkt_ip->ip_v = 4;
 	send_pkt_ip->ip_hl = (sizeof(sr_ip_hdr_t)/4);
           send_pkt_ip->ip_tos = iphdr->ip_tos;
-          send_pkt_ip->ip_len = (sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
+          send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t)));
           send_pkt_ip->ip_id = iphdr->ip_id;
           send_pkt_ip->ip_off = 0;
           send_pkt_ip->ip_ttl = 255;
