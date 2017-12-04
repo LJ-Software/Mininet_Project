@@ -486,7 +486,7 @@ void sr_handlepacket(struct sr_instance* sr,
         }
         /* if the IP protocol is TCP (6) or UDP (17): respond with port unreachable */
       } else if (iphdr->ip_p == 6 || iphdr->ip_p == 17){
-          uint32_t send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t);
+          uint32_t send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
@@ -526,7 +526,7 @@ void sr_handlepacket(struct sr_instance* sr,
     } else {
 	/* Check if ttl is <= 1. if it is respond with ICMP time exceeded */
 	if (iphdr->ip_ttl <= 1){
-	    uint32_t send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t);
+	    uint32_t send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
@@ -579,7 +579,7 @@ void sr_handlepacket(struct sr_instance* sr,
     	}
 	if(isOnRoutingTable == 0){
         	/* if there is not a match respond ICMP network unreachable */
-	    uint32_t send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t);
+	    uint32_t send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t);
           uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
