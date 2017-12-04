@@ -434,6 +434,7 @@ void sr_handlepacket(struct sr_instance* sr,
 	*/
     /* if the packet IS destined for this router */
     if(isDestinedForRouter == 1){
+	fprintf(stderr,"This packet is destined for this router\n");
       /* if the IP protocol is ICMP: respond */
       if(iphdr->ip_p == htons(ip_protocol_icmp)){
         sr_icmp_t3_hdr_t *icmphdr = (sr_icmp_t3_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
