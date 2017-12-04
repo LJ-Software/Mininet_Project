@@ -439,7 +439,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
               sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
               sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
-              sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+              sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_t3_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
               memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
@@ -478,7 +478,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
-          sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+          sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_t3_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
           memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
@@ -518,7 +518,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
-          sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+          sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_t3_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
           memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
@@ -571,7 +571,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
-          sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+          sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_t3_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
           memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
@@ -619,7 +619,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
-	 sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+	 sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_t3_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 		
           memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
