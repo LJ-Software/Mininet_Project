@@ -390,7 +390,7 @@ void sr_handlepacket(struct sr_instance* sr,
   print_hdrs(packet,len);
     
   /* Determine if packet is ARP or IP */
-    switch(ehdr->ether_type){
+    switch(ntohs(ehdr->ether_type)){
       /* If ARP: pass to sr_handlepacket_arp function */
       case 0x0806:
 	  fprintf(stderr,"Received ARP packet\n");
