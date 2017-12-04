@@ -387,7 +387,7 @@ void sr_handlepacket(struct sr_instance* sr,
   }
 
   sr_ethernet_hdr_t *ehdr = (sr_ethernet_hdr_t *) packet;
-  fprintf(stderr,"ether type is\n" + ehdr->ether_type);
+  print_hdrs(packet,len);
     
   /* Determine if packet is ARP or IP */
     switch(ehdr->ether_type){
