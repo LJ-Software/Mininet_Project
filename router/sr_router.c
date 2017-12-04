@@ -416,7 +416,12 @@ void sr_handlepacket(struct sr_instance* sr,
         /* Check if this packet is destined to this router or not */
     int isDestinedForRouter = 0;
 
-    struct sr_if* if_walker = 0;
+	if(iphdr->ip_dst == (uint32_t)sr->sr_addr.sin_addr.s_addr){
+		isDestinedForRouter = 1;
+	}
+
+
+   /* struct sr_if* if_walker = 0;
 
     if_walker = sr->if_list;
     
@@ -426,16 +431,16 @@ void sr_handlepacket(struct sr_instance* sr,
           isDestinedForRouter = 1;
         }
     }
-
+	*/
     /* if the packet IS destined for this router */
     if(isDestinedForRouter == 1){
       /* if the IP protocol is ICMP: respond */
-      if(iphdr->ip_p == 1){
-        sr_icmp_hdr_t *icmphdr = (sr_icmp_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+      if(iphdr->ip_p == htons(ip_protocol_icmp)){
+        sr_icmp_t3_hdr_t *icmphdr = (sr_icmp_t3_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
         switch(icmphdr->icmp_type){
           case 8: ;
           /* Build packet to send */
-              uint32_t send_pkt_len = (sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t));
+              uint32_t send_pkt_len = (sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t));
               uint8_t *send_pkt = malloc(send_pkt_len);
 
               sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
