@@ -389,14 +389,15 @@ void sr_handlepacket(struct sr_instance* sr,
   sr_ethernet_hdr_t *ehdr = (sr_ethernet_hdr_t *) packet;
     
   /* Determine if packet is ARP or IP */
-    switch(ethertype(packet)){
+    switch(ehdr->ether_type){
       /* If ARP: pass to sr_handlepacket_arp function */
-      case 2054:
+      case 0x0806:
       sr_handlepacket_arp(sr,packet,len,sr_get_interface(sr,interface));
+	  return;
       break;
-    
+
       /* If IP: */
-      case 2048: ;
+      case 0x0800: ;
       sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t));
         /* Check if IP packet length meets minimum */
       if (len < (minlength + sizeof(sr_ip_hdr_t))) {
@@ -602,6 +603,7 @@ void sr_handlepacket(struct sr_instance* sr,
           sr_send_packet(sr, send_pkt, send_pkt_len, interface);
 	free(send_pkt);
 	} else{
+	/* if there is a hit on the routing table*/
 	/* decrement the ttl & recalculate checksum */
           iphdr->ip_ttl -= 1;
 	iphdr->ip_sum = cksum(iphdr, sizeof(sr_ip_hdr_t));
@@ -610,45 +612,6 @@ void sr_handlepacket(struct sr_instance* sr,
           /* if there is a miss send an ARP request to the IP dest*/
 	if(arp_entry == 0){
             sr_waitforarp(sr,packet,len,iphdr->ip_dst,sr_get_interface(sr,rt_entry->interface));
-	}
-	arp_entry = sr_arpcache_lookup(&(sr->cache),iphdr->ip_dst);
-	if(arp_entry == 0){
-		/* if there is not a match respond ICMP host unreachable */
-	    uint32_t send_pkt_len = sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t);
-          uint8_t *send_pkt = (uint8_t *)malloc(send_pkt_len);
-
-          sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
-          sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
-	 sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_t3_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
-		
-          memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
-        memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
-          send_pkt_eth->ether_type = htons(ethertype_ip);
-
-	send_pkt_ip->ip_v = 4;
-	send_pkt_ip->ip_hl = (sizeof(sr_ip_hdr_t)/4);
-          send_pkt_ip->ip_tos = iphdr->ip_tos;
-          send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t)));
-          send_pkt_ip->ip_id = iphdr->ip_id;
-          send_pkt_ip->ip_off = 0;
-          send_pkt_ip->ip_ttl = 255;
-          send_pkt_ip->ip_p = 1;
-          send_pkt_ip->ip_sum = 0;
-	uint32_t ip_new_src = iphdr->ip_src;;
-          send_pkt_ip->ip_src = iphdr->ip_dst;
-          send_pkt_ip->ip_dst = ip_new_src;
-              
-          send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
-		
-	 send_pkt_icmp->icmp_type = 3;
-          send_pkt_icmp->icmp_code = 0;
-          send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_t3_hdr_t));	
-		
-		fprintf(stderr,"Attempting to send the following ICMP Host unreachable packet\n");
-		print_hdrs(send_pkt, send_pkt_len);
-
-          sr_send_packet(sr, send_pkt, send_pkt_len, interface);
-	free(send_pkt);
 	}else{
           /* if there is a hit use the IP and MAC info to forward to next hop */
 	memcpy(ehdr->ether_dhost, arp_entry->mac, ETHER_ADDR_LEN);
