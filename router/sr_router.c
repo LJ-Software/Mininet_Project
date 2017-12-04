@@ -425,11 +425,11 @@ void sr_handlepacket(struct sr_instance* sr,
 
     if_walker = sr->if_list;
     
-    while(if_walker->next){
-        if_walker = if_walker->next;
+    while(if_walker->next != NULL){
         if (iphdr->ip_dst == if_walker->ip){
           isDestinedForRouter = 1;
         }
+		if_walker = if_walker->next;
     }
 	
     /* if the packet IS destined for this router */
