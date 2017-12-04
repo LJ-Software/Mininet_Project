@@ -439,7 +439,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
               sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
               sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
-              sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+              sr_icmp__t3_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
               memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
@@ -448,7 +448,7 @@ void sr_handlepacket(struct sr_instance* sr,
 			send_pkt_ip->ip_v = 4;
 	send_pkt_ip->ip_hl = (sizeof(sr_ip_hdr_t)/4);
               send_pkt_ip->ip_tos = iphdr->ip_tos;
-              send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t)));
+              send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t)));
               send_pkt_ip->ip_id = iphdr->ip_id;
               send_pkt_ip->ip_off = 0;
               send_pkt_ip->ip_ttl = 255;
@@ -462,7 +462,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
               send_pkt_icmp->icmp_type = 0;
               send_pkt_icmp->icmp_code = 0;
-              send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
+              send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_t3_hdr_t));
 
 		fprintf(stderr,"Attempting to send the following ICMP Response packet\n");
 		print_hdrs(send_pkt, send_pkt_len);
@@ -478,7 +478,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
-          sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+          sr_icmp__t3_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
           memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
@@ -487,7 +487,7 @@ void sr_handlepacket(struct sr_instance* sr,
 	      send_pkt_ip->ip_v = 4;
 	send_pkt_ip->ip_hl = (sizeof(sr_ip_hdr_t)/4);
           send_pkt_ip->ip_tos = iphdr->ip_tos;
-          send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t)));
+          send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t)));
           send_pkt_ip->ip_id = iphdr->ip_id;
           send_pkt_ip->ip_off = 0;
           send_pkt_ip->ip_ttl = 255;
@@ -501,7 +501,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           send_pkt_icmp->icmp_type = 3;
           send_pkt_icmp->icmp_code = 3;
-          send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
+          send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_t3_hdr_t));
 	      
 	      fprintf(stderr,"Attempting to send the following ICMP Port unreachable packet\n");
 		print_hdrs(send_pkt, send_pkt_len);
@@ -518,7 +518,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
-          sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+          sr_icmp__t3_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
           memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
@@ -527,7 +527,7 @@ void sr_handlepacket(struct sr_instance* sr,
 		send_pkt_ip->ip_v = 4;
 	send_pkt_ip->ip_hl = (sizeof(sr_ip_hdr_t)/4);
           send_pkt_ip->ip_tos = iphdr->ip_tos;
-          send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t)));
+          send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t)));
           send_pkt_ip->ip_id = iphdr->ip_id;
           send_pkt_ip->ip_off = 0;
           send_pkt_ip->ip_ttl = 255;
@@ -541,7 +541,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           send_pkt_icmp->icmp_type = 11;
           send_pkt_icmp->icmp_code = 0;
-          send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
+          send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_t3_hdr_t));
 
 		fprintf(stderr,"Attempting to send the following ICMP Time Exceeded packet\n");
 		print_hdrs(send_pkt, send_pkt_len);
@@ -571,7 +571,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
-          sr_icmp_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+          sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
 
           memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         	memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
@@ -580,7 +580,7 @@ void sr_handlepacket(struct sr_instance* sr,
 		send_pkt_ip->ip_v = 4;
 	send_pkt_ip->ip_hl = (sizeof(sr_ip_hdr_t)/4);
           send_pkt_ip->ip_tos = iphdr->ip_tos;
-          send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_hdr_t)));
+          send_pkt_ip->ip_len = htons((sizeof(sr_ip_hdr_t) + sizeof(sr_icmp_t3_hdr_t)));
           send_pkt_ip->ip_id = iphdr->ip_id;
           send_pkt_ip->ip_off = 0;
           send_pkt_ip->ip_ttl = 255;
@@ -594,7 +594,7 @@ void sr_handlepacket(struct sr_instance* sr,
 
           send_pkt_icmp->icmp_type = 3;
           send_pkt_icmp->icmp_code = 0;
-          send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_hdr_t));
+          send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_t3_hdr_t));
 		
 		fprintf(stderr,"Attempting to send the following ICMP Network unreachable packet\n");
 		print_hdrs(send_pkt, send_pkt_len);
@@ -619,7 +619,8 @@ void sr_handlepacket(struct sr_instance* sr,
 
           sr_ethernet_hdr_t *send_pkt_eth = (sr_ethernet_hdr_t *)send_pkt;
           sr_ip_hdr_t *send_pkt_ip = (sr_ip_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t));
-	
+	 sr_icmp_t3_hdr_t *send_pkt_icmp = (sr_icmp_hdr_t *)(send_pkt + sizeof(sr_ethernet_hdr_t) + sizeof(sr_ip_hdr_t));
+		
           memcpy(send_pkt_eth->ether_dhost, ehdr->ether_shost, ETHER_ADDR_LEN);
         memcpy(send_pkt_eth->ether_shost, ehdr->ether_dhost, ETHER_ADDR_LEN);
           send_pkt_eth->ether_type = htons(ethertype_ip);
@@ -638,6 +639,10 @@ void sr_handlepacket(struct sr_instance* sr,
           send_pkt_ip->ip_dst = ip_new_src;
               
           send_pkt_ip->ip_sum = cksum(send_pkt_ip, sizeof(sr_ip_hdr_t));
+		
+	 send_pkt_icmp->icmp_type = 3;
+          send_pkt_icmp->icmp_code = 0;
+          send_pkt_icmp->icmp_sum = cksum(send_pkt_icmp, sizeof(sr_icmp_t3_hdr_t));	
 		
 		fprintf(stderr,"Attempting to send the following ICMP Host unreachable packet\n");
 		print_hdrs(send_pkt, send_pkt_len);
