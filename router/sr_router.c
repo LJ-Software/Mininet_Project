@@ -570,12 +570,12 @@ void sr_handlepacket(struct sr_instance* sr,
 
     	rt_walker = sr->routing_table;
     
-    	while(rt_walker->next){
-        	rt_walker = rt_walker->next;
+    	while(rt_walker->next != NULL){
         	if (iphdr->ip_dst == rt_walker->dest.s_addr){
           	isOnRoutingTable = 1;
-		rt_entry = rt_walker;
+			rt_entry = rt_walker;
         	}
+			rt_walker = rt_walker->next;
     	}
 	if(isOnRoutingTable == 0){
         	/* if there is not a match respond ICMP network unreachable */
