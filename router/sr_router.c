@@ -392,12 +392,14 @@ void sr_handlepacket(struct sr_instance* sr,
     switch(ehdr->ether_type){
       /* If ARP: pass to sr_handlepacket_arp function */
       case 0x0806:
+	  fprintf(stderr,"Received ARP packet\n");
       sr_handlepacket_arp(sr,packet,len,sr_get_interface(sr,interface));
 	  return;
       break;
 
       /* If IP: */
       case 0x0800: ;
+	  fprintf(stderr,"Received IP packet\n");
       sr_ip_hdr_t *iphdr = (sr_ip_hdr_t *)(packet + sizeof(sr_ethernet_hdr_t));
         /* Check if IP packet length meets minimum */
       if (len < (minlength + sizeof(sr_ip_hdr_t))) {
@@ -427,6 +429,7 @@ void sr_handlepacket(struct sr_instance* sr,
     
     while(if_walker->next != NULL){
         if (iphdr->ip_dst == if_walker->ip){
+		fprintf(stderr,"This packet is destined for this router\n");
           isDestinedForRouter = 1;
         }
 		if_walker = if_walker->next;
