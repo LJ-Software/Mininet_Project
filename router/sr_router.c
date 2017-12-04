@@ -416,12 +416,12 @@ void sr_handlepacket(struct sr_instance* sr,
         /* Check if this packet is destined to this router or not */
     int isDestinedForRouter = 0;
 
-	if(iphdr->ip_dst == (uint32_t)sr->sr_addr.sin_addr.s_addr){
+	/*if(iphdr->ip_dst == (uint32_t)sr->sr_addr.sin_addr.s_addr){
 		isDestinedForRouter = 1;
-	}
+	}*/
 
 
-   /* struct sr_if* if_walker = 0;
+   struct sr_if* if_walker = 0;
 
     if_walker = sr->if_list;
     
@@ -431,7 +431,7 @@ void sr_handlepacket(struct sr_instance* sr,
           isDestinedForRouter = 1;
         }
     }
-	*/
+	
     /* if the packet IS destined for this router */
     if(isDestinedForRouter == 1){
 	fprintf(stderr,"This packet is destined for this router\n");
